@@ -61,6 +61,7 @@ export default class GitApi {
         mergeable: data.mergeable,
       } as IPRInfo
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error)
       return {}
     }
@@ -88,6 +89,7 @@ export default class GitApi {
         return { isNeedUpdate: false }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error)
       return { isNeedUpdate: false }
     }
@@ -108,6 +110,7 @@ export default class GitApi {
       )
       return res.data.message
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error)
       return {}
     }
