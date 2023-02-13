@@ -47,12 +47,12 @@
     "test:coverage": "vitest --coverage"
   },
   "peerDependencies": {
-    "chalk": "4.1.2",
+    "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
     "ora": "^6.1.2"
   },
   "dependencies": {
-    "chalk": "4.1.2",
+    "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
     "ora": "^6.1.2"
   },
@@ -61,14 +61,15 @@
     "@changesets/cli": "^2.26.0",
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",
-    "@pr-checker/build": "*",
-    "@pr-checker/entry": "*",
-    "@pr-checker/play": "*",
-    "@pr-checker/utils": "*",
+    "@pr-checker/build": "workspace:*",
+    "@pr-checker/entry": "workspace:*",
+    "@pr-checker/play": "workspace:*",
+    "@pr-checker/utils": "workspace:*",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@types/fs-extra": "^11.0.1",
     "@types/gulp": "^4.0.10",
     "@types/node": "^18.0.0",
+    "@types/chalk": "^2.2.0",
     "@vitest/coverage-c8": "^0.23.4",
     "@vitest/ui": "^0.23.4",
     "bumpp": "^8.2.1",

@@ -8,5 +8,5 @@ export const entry = {
 export const distDirMap = {
   '@pr-checker/utils': 'dist/utils/index[format]',
   '@pr-checker/core': 'dist/core/index[format]',
-  '@pr-checker/bin': '../dist/bin/index[format]',
+  '@pr-checker/bin': 'dist/bin/index[format]',
 }

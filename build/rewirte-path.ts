@@ -18,7 +18,7 @@ const formatList = [
 ]
 
 export const parallelTask = () => {
-  const parallelTaskList = []
+  const parallelTaskList: any[] = []
   formatList.forEach((formatVal) => {
     parallelTaskList.push(parallel(() => {
       return src(formatVal.runPath)
@@ -27,15 +27,14 @@ export const parallelTask = () => {
           let content = fileData.contents.toString()
           // 当前读取的文件路径
           const filePath = fileData.path.replaceAll('\\', '/')
-
           for (const distDirMapKey in distDirMap) {
             // 生产要替换的依赖路径 @xxxx ->  ../xxxx
-            let targetPath = path.resolve(process.cwd(), distDirMap[distDirMapKey])
+            let targetPath = path.resolve(
+              process.cwd(),
+              distDirMap[distDirMapKey as keyof typeof distDirMap])
             // 替换格式后缀 .[format] -> .js / .cjs
             targetPath = targetPath.replace('[format]', formatVal.format)
-            // @ts-expect-error replaceAll error
             targetPath = targetPath.replaceAll('\\', '/')
-
             // 生产相对路径
             const relativePath = relativeDir(targetPath, filePath)
             // 替换依赖路径内容

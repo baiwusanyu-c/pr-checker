@@ -8,10 +8,11 @@
   "author": "",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:version": "pr-checker -v",
+    "test:help": "pr-checker -h"
   },
 
   "devDependencies": {
-    "@pr-checker/entry": "*"
+    "@pr-checker/entry": "workspace:*"
   }
 }

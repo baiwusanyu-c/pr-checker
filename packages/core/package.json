@@ -11,6 +11,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@pr-checker/utils": "*"
+    "@pr-checker/utils": "workspace:*"
   }
 }
