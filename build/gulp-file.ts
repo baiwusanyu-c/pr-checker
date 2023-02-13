@@ -17,7 +17,7 @@ const movePkgToRootDist = async() => {
   const content = JSON.parse(JSON.stringify(pkg))
   Reflect.deleteProperty(content, 'scripts')
   Reflect.deleteProperty(content, 'lint-staged')
-  // Reflect.deleteProperty(content, 'devDependencies')
+  Reflect.deleteProperty(content, 'devDependencies')
   Reflect.deleteProperty(content, 'eslintConfig')
   content.type = 'module'
   content.files = []

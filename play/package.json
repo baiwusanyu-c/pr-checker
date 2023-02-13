@@ -11,8 +11,9 @@
     "test": "pr-checker",
     "test:version": "pr-checker -v",
     "test:help": "pr-checker -h",
+    "test:clear": "pr-checker -c",
     "test:username": "pr-checker -u baiwusanyu-c",
-    "test:token": "pr-checker -t baiwusanyu-c"
+    "test:token": "esno token.ts"
   },
 
   "devDependencies": {

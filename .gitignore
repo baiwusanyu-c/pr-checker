@@ -6,3 +6,4 @@
 /play/node_modules/
 /utils/node_modules/
 dist
+play/token.ts

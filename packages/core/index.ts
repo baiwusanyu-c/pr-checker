@@ -8,7 +8,7 @@ export const run = async(args: Array<string>) => {
   console.log(storage)
   if (args[0] === '-c' && storage) {
     await clearStorage()
-    log('success', 'token set successfully')
+    log('success', 'clear token and username successfully')
     return
   }
   // set git token

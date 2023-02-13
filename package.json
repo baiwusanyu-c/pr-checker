@@ -36,7 +36,7 @@
     "init": "pnpm i",
     "lint:fix": "eslint . --fix",
     "dev": "cross-env RUNTIME_ENV=development esno watch play/index.ts",
-    "build": "pnpm run clean && cross-env RUNTIME_ENV=production pnpm run --filter @pr-checker/build build",
+    "build": "cross-env RUNTIME_ENV=production pnpm run --filter @pr-checker/build build",
     "prepublishOnly": "pnpm run build",
     "release": "bumpp package.json --commit --push --tag && pnpm -r publish --access public",
     "publish": "pnpm run release && pnpm publish --no-git-checks --access public",
