@@ -1,27 +1,75 @@
 import * as process from 'process'
 import { log } from '@pr-checker/utils'
+import { cac } from 'cac'
+import { version } from '../../package.json'
 import { clearStorage, loadStorage, saveStorage } from './storage'
-
-export const run = async(args: Array<string>) => {
+import { runtimeStart } from './runtime'
+import type { Storage } from './storage'
+const cli = cac('pr-checker')
+export const run = async() => {
   // load storage
   const storage = await loadStorage()
-  console.log(storage)
-  if (args[0] === '-c' && storage) {
-    await clearStorage()
-    log('success', 'clear token and username successfully')
+  // set github token
+  cli.option('-t <token>,--token <token>', 'set github token')
+  // set github username
+  cli.option('-u <username>, --username <username>', 'set github username')
+  // clear token and username
+  cli.option('-c, --clear', 'clear token and username')
+  // get git config
+  cli.option('-g, --get', 'get git config')
+
+  cli.command('run').action(async() => {
+    runtimeStart(storage as Storage)
+  })
+  cli.help()
+  cli.version(version)
+  const parseRes = cli.parse()
+  const {
+    u,
+    username,
+    t,
+    token,
+    c,
+    clear,
+    h,
+    help,
+    v,
+    g,
+    get,
+    version: versions,
+  } = parseRes.options
+  if (h || help || v || versions)
     return
+
+  // clear token and username
+  if (c || clear) {
+    if (storage) {
+      await clearStorage()
+      log('success', 'clear token and username successfully')
+      return
+    }
   }
+
+  // get git config
+  if (g || get) {
+    if (storage) {
+      log('info', `username: ${storage.username || 'null'}`)
+      log('info', `token: ${storage.token || 'null'}`)
+      return
+    }
+  }
+
   // set git token
-  if (args[0] === '-t') {
-    storage.token = args[1]
+  if ((t && typeof t === 'string') || (token && typeof token === 'string')) {
+    storage.token = t || token
     await saveStorage()
     log('success', 'token set successfully')
     return
   }
 
   // set username
-  if (args[0] === '-u') {
-    storage.username = args[1]
+  if ((u && typeof u === 'string') || (username && typeof username === 'string')) {
+    storage.username = u || username
     await saveStorage()
     log('success', 'username set successfully')
     return

@@ -8,13 +8,15 @@
   "author": "",
   "main": "index.ts",
   "scripts": {
-    "test": "pr-checker",
+    "test": "pr-checker run",
     "test:version": "pr-checker -v",
     "test:help": "pr-checker -h",
     "test:clear": "pr-checker -c",
+    "test:get": "pr-checker -g",
     "test:username": "pr-checker -u baiwusanyu-c",
-    "test:token": "esno token.ts",
-    "test:runtime": "esno index.ts"
+    "test:token": "pr-checker -t baiwusanyu-c",
+    "test:token:script": "esno token.ts",
+    "test:runtime": "esno index.ts -t adwqdwq"
   },
 
   "devDependencies": {

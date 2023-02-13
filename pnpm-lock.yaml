@@ -93,6 +93,20 @@ importers:
       sucrase: 3.29.0
       tsup: 6.6.2
 
+  dist:
+    specifiers:
+      '@octokit/core': ^4.2.0
+      cac: ^6.7.14
+      chalk: ^5.2.0
+      fs-extra: ^10.0.1
+      ora: ^6.1.2
+    dependencies:
+      '@octokit/core': 4.2.0
+      cac: 6.7.14
+      chalk: 5.2.0
+      fs-extra: 10.1.0
+      ora: 6.1.2
+
   packages/bin:
     specifiers: {}
 

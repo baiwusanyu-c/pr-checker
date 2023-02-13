@@ -48,17 +48,17 @@
   },
   "peerDependencies": {
     "@octokit/core": "^4.2.0",
+    "cac": "^6.7.14",
     "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
-    "ora": "^6.1.2",
-    "cac": "^6.7.14"
+    "ora": "^6.1.2"
   },
   "dependencies": {
     "@octokit/core": "^4.2.0",
+    "cac": "^6.7.14",
     "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
-    "ora": "^6.1.2",
-    "cac": "^6.7.14"
+    "ora": "^6.1.2"
   },
   "devDependencies": {
     "@baiwusanyu/eslint-config": "^1.0.10",
