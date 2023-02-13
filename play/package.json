@@ -13,7 +13,8 @@
     "test:help": "pr-checker -h",
     "test:clear": "pr-checker -c",
     "test:username": "pr-checker -u baiwusanyu-c",
-    "test:token": "esno token.ts"
+    "test:token": "esno token.ts",
+    "test:runtime": "esno index.ts"
   },
 
   "devDependencies": {

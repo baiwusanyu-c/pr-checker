@@ -50,13 +50,15 @@
     "@octokit/core": "^4.2.0",
     "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
-    "ora": "^6.1.2"
+    "ora": "^6.1.2",
+    "cac": "^6.7.14"
   },
   "dependencies": {
     "@octokit/core": "^4.2.0",
     "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
-    "ora": "^6.1.2"
+    "ora": "^6.1.2",
+    "cac": "^6.7.14"
   },
   "devDependencies": {
     "@baiwusanyu/eslint-config": "^1.0.10",
