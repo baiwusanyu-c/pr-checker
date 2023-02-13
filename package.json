@@ -47,11 +47,13 @@
     "test:coverage": "vitest --coverage"
   },
   "peerDependencies": {
+    "@octokit/core": "^4.2.0",
     "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
     "ora": "^6.1.2"
   },
   "dependencies": {
+    "@octokit/core": "^4.2.0",
     "chalk": "^5.2.0",
     "fs-extra": "^10.0.1",
     "ora": "^6.1.2"
