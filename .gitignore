@@ -1,0 +1,7 @@
+# Project exclude paths
+/build/node_modules/
+/node_modules/
+/packages/entry/node_modules/
+/packages/runtime/node_modules/
+/play/node_modules/
+/utils/node_modules/

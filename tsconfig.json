@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "noImplicitThis": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    "lib": ["ESNext", "DOM"],
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "/packages/**/*.ts",
+    "/utils/**/*.ts",
+    "/build/**/*.ts",
+    "/build/utils.ts"
+  ],
+  // ts 排除的文件
+  "exclude": ["node_modules", "**/__tests__/"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
