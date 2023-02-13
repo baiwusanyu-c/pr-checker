@@ -1,5 +1,5 @@
 {
-  "name": "@pr-checker/runtime",
+  "name": "@pr-checker/core",
   "description": "",
   "type": "module",
   "version": "1.0.0",

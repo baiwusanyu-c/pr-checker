@@ -2,7 +2,10 @@
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
-    "esModuleInterop": true,
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "play/vite.config.ts"
+  ]
 }

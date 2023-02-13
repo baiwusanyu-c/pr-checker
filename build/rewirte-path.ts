@@ -2,7 +2,7 @@ import * as process from 'process'
 import * as path from 'path'
 import { dest, parallel, src } from 'gulp'
 import { relativeDir } from './utils'
-
+import { distDirMap } from './contant'
 /**
  * Define the replacement dependency path here,
  * the path is the dist directory to the directory corresponding to the real file.
@@ -11,10 +11,6 @@ import { relativeDir } from './utils'
  * but the directory structure of the packaged product may be the same as your single-repository structure,
  * so after the packaging is completed, we Dependency paths need to be replaced
  */
-const distDirMap = {
-  '@pr-checker/utils': 'dist/utils/index[format]',
-  '@pr-checker/runtime': 'dist/runtime/index[format]',
-}
 const formatList = [
   { runPath: path.resolve(process.cwd(), 'dist/**/*.js'), format: '.js' },
   { runPath: path.resolve(process.cwd(), 'dist/**/*.cjs'), format: '.cjs' },

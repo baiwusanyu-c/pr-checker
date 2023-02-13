@@ -1,0 +1,10 @@
+{
+  "name": "@pr-checker/bin",
+  "description": "",
+  "type": "module",
+  "version": "1.0.0",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "main": "index.ts"
+}
