@@ -8,8 +8,11 @@
   "author": "",
   "main": "index.ts",
   "scripts": {
+    "test": "pr-checker",
     "test:version": "pr-checker -v",
-    "test:help": "pr-checker -h"
+    "test:help": "pr-checker -h",
+    "test:username": "pr-checker -u baiwusanyu-c",
+    "test:token": "pr-checker -t baiwusanyu-c"
   },
 
   "devDependencies": {
