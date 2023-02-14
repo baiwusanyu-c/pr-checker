@@ -24,6 +24,7 @@ importers:
       bumpp: ^8.2.1
       cac: ^6.7.14
       chalk: ^5.2.0
+      console-table-printer: ^2.11.1
       conventional-changelog-cli: ^2.2.2
       cross-env: ^7.0.3
       eslint: 8.32.0
@@ -46,6 +47,7 @@ importers:
       '@octokit/core': 4.2.0
       cac: 6.7.14
       chalk: 5.2.0
+      console-table-printer: 2.11.1
       fs-extra: 10.1.0
       ora: 6.1.2
       prompts: 2.4.2
@@ -2332,6 +2334,12 @@ packages:
       readable-stream: 2.3.7
       typedarray: 0.0.6
     dev: true
+
+  /console-table-printer/2.11.1:
+    resolution: {integrity: sha512-8LfFpbF/BczoxPwo2oltto5bph8bJkGOATXsg3E9ddMJOGnWJciKHldx2zDj5XIBflaKzPfVCjOTl6tMh7lErg==}
+    dependencies:
+      simple-wcswidth: 1.0.1
+    dev: false
 
   /conventional-changelog-angular/5.0.13:
     resolution: {integrity: sha512-i/gipMxs7s8L/QeuavPF2hLnJgH6pEZAttySB6aiQLWcX3puWDL3ACVmvBhJGxnAy52Qc15ua26BufY6KpmrVA==}
@@ -7147,6 +7155,10 @@ packages:
     hasBin: true
     requiresBuild: true
     dev: true
+
+  /simple-wcswidth/1.0.1:
+    resolution: {integrity: sha512-xMO/8eNREtaROt7tJvWJqHBDTMFN4eiQ5I4JRMuilwfnFcV5W9u7RUkueNkdw0jPqGMX36iCywelS5yilTuOxg==}
+    dev: false
 
   /sirv/2.0.2:
     resolution: {integrity: sha512-4Qog6aE29nIjAOKe/wowFTxOdmbEZKb+3tsLljaBRzJwtqto0BChD2zzH0LhgCSXiI+V7X+Y45v14wBZQ1TK3w==}
