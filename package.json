@@ -1,9 +1,9 @@
 {
   "name": "pr-checker",
-  "description": "\uD83C\uDF37 Detect and update your Pull Requests in batches",
+  "description": "🌷 Detect and update your Pull Requests in batches",
   "private": false,
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packageManager": "^pnpm@7.0.0",
   "keywords": [
     "github",
