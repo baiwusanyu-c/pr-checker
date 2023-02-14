@@ -1,48 +1,49 @@
 
 # 🚀 PR-Checker
 
-Detect and update your Pull Requests in batches
+检测您所提交的 `PR` 并自动更新
 
-English | [中文](https://github.com/baiwusanyu-c/pr-checker/blob/master/README.ZH-CN.md)
-## Features
+[English](https://github.com/baiwusanyu-c/pr-checker/blob/master/README.md) | 中文
 
-- ⚡️Check whether the `PR` submitted by you needs to be updated according to the warehouse
-- ☘ Choose to update your submitted `PR` by command according to the repository
-- 🔥️ Check whether all `PR` under your account need to be updated with one click of the command
-- 🌷 Choose to update all `PR` under your account by command
+## 特性
 
-## How to ues ?
+- ⚡️通过指令按照仓库检测您所提交的 `PR` 是否需要更新
+- ☘️通过指令按照仓库选择更新您所提交的 `PR`
+- 🔥️通过指令一键检测您账号下所有 `PR` 是否需要更新
+- 🌷通过指令选择更新您账号下所有 `PR`
 
-#### 1.Install
+## 使用
+
+#### 1.安装
 
 ```` shell
 pnpm install pr-checker --global
 ````
-or
+或
 ```` shell
 npm install pr-checker --global
 ````
-or
+或
 ```` shell
 yarn install pr-checker --global
 ````
 
-#### 2.Run command to use `pr-checker`
+#### 2.运行命令 `pr-checker`
 
 ```` shell
 pr-checker run
 ````
 
-#### 3. Select type
+#### 3. 选择类型
 
 ```` shell
 ? Detect all Repo's PR? » - Use arrow-keys. Return to submit.
->   All Repo
-    Detect the PR of a certain Repo
+>   All Repo // 更新所有仓库的 PR
+    Detect the PR of a certain Repo // 选择一个仓库的 PR
 
 ````
 
-#### 4. Select Repo (if you choose `Detect the PR of a certain Repo`)
+#### 4. 选择你仓库(如果你选择了 `Detect the PR of a certain Repo`)
 
 ```` shell
 ? Please select a Repo » - Use arrow-keys. Return to submit.
@@ -51,7 +52,7 @@ pr-checker run
     mistjs/vite-plugin-copy-files
 
 ````
-After that, the `PR` will be checked to see if it can be updated
+之后会开始对 `PR` 进行检测，是否能够进行更新
 ```shell
 √ Please select a Repo » vuejs/core
 | Checking PR by vuejs/core......✔ NO.1:Check PR #7662 completed
@@ -62,7 +63,7 @@ After that, the `PR` will be checked to see if it can be updated
 
 ```
 
-#### 5. Select `PR` to update
+#### 5. 选择 `PR` 进行更新
 
 ```` shell
 ? Please select the PR that needs to be updated »
@@ -83,8 +84,7 @@ Instructions:
 ( ) ↓ <CanMerge:true>: [vuejs/core]-[#7341] -> fix(runtime-core): Fix cssvars reporting error when teleport is disabled
 
 ````
-After the last update is completed, those that do not meet the update conditions (such as code conflicts) will be deemed unable to be automatically updated.
-
+最后更新完成，不符合更新条件的（例如存在代码冲突），会被认定为无法自动更新。
 ```shell
 √ Update PR by vuejs/core......
 ✔ All PR updates completed
@@ -109,9 +109,9 @@ After the last update is completed, those that do not meet the update conditions
 │ #6224  │ true      │ true    │ <vuejs/core> │ feat(runtime-core): Update rendering error caused by shallow copy #6221                        │     
 └────────┴───────────┴─────────┴──────────────┴────────────────────────────────────────────────────────────────────────────────────────────────┘  
 ```
-## Screenshot
+## 快照
 <img src="./public/img1.png" alt="Detect and update your Pull Requests in batches"/>
 <img src="./public/img2.png" alt="Detect and update your Pull Requests in batches"/>
 
-## Thanks
+## 鸣谢
 * [cpr](https://github.com/edison1105/cpr)
