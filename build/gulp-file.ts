@@ -20,6 +20,9 @@ const movePkgToRootDist = async() => {
   Reflect.deleteProperty(content, 'devDependencies')
   Reflect.deleteProperty(content, 'eslintConfig')
   content.type = 'module'
+  content.scripts = {
+    publish: 'pnpm publish --no-git-checks --access public'
+  }
   content.files = []
   // 寫入 files
   for (const key in entry) {
