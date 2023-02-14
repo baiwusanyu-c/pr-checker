@@ -16,8 +16,8 @@ export async function runtimeStart(store: Storage) {
   const isAllRepo = await promptsRun(typeOption)
 
   let spinner = ora({ text: 'Loading Repo......', color: 'blue' }).start()
-  const api = new GitApi(store.token, store.username!)
-  const prList = await api.getPRList()
+  const githubApi = new GitApi(store.token, store.username!)
+  const prList = await githubApi.getPRList()
   spinner.stop()
   const repoList = Object.keys(prList)
 
@@ -27,13 +27,13 @@ export async function runtimeStart(store: Storage) {
 
     const prListByRepo = []
     const prl = prList[selectRepo.RepoSelect as keyof typeof prList] as IPRListItem[]
-    spinner = ora({ text: `Checking Pr by ${selectRepo.RepoSelect}......`, color: 'blue' }).start()
+    spinner = ora({ text: `Checking PR by ${selectRepo.RepoSelect}......`, color: 'blue' }).start()
     for (let i = 0; i < prl.length; i++) {
       // 循环，根据 pr number 和 仓库名获取 pr 详情
-      const prInfo = await api.getPRByRepo(prl[i].number, prl[i].repo, prl[i].title)
+      const prInfo = await githubApi.getPRByRepo(prl[i].number, prl[i].repo, prl[i].title)
       // 根据 pr 详情，检测是否可以更新
-      const res = await api.needUpdate(prl[i].repo, prInfo as IPRInfo)
-      log('success', `check pr #${prl[i].number} completed`)
+      const res = await githubApi.needUpdate(prl[i].repo, prInfo as IPRInfo)
+      log('success', `✔ NO.${i + 1}:Check PR #${prl[i].number} completed`)
       prListByRepo.push({
         ...prInfo,
         isNeedUpdate: res.isNeedUpdate,
@@ -42,17 +42,55 @@ export async function runtimeStart(store: Storage) {
     spinner.stop()
 
     // 选择仓库下的 pr ，全部，多选
-    const prSelect = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
-    spinner = ora({ text: `update Pr by ${selectRepo.RepoSelect}......`, color: 'blue' }).start()
-    for (let i = 0; i < prSelect.length; i++) {
-      if (prSelect[i].isNeedUpdate) {
-        await api.updatePR(prSelect[i].number, prSelect[i].repo)
-        log('success', `update pr #${prl[i].number} completed`)
+    const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
+    spinner = ora({ text: `Update PR by ${selectRepo.RepoSelect}......`, color: 'blue' }).start()
+    for (let i = 0; i < prSelectRes.prSelect.length; i++) {
+      if (prSelectRes.prSelect[i].isNeedUpdate) {
+        await githubApi.updatePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+        log('success', `✔ NO.${i + 1}:Update PR #${prl[i].number} completed`)
+      } else {
+        // TODO console.log(prSelectRes.prSelect[i].infoTitle)
       }
     }
-    log('success', 'All PR updates completed')
-    spinner.succeed()
+    spinner.stop()
+    log('success', '✔ All PR updates completed')
   } else {
-    console.log('TODO.....')
+    // TODO
+    const prl = [] as IPRListItem[]
+    const prListByRepo = []
+    repoList.forEach((val: string) => {
+      (prList[val as keyof typeof prList] as IPRListItem[]).forEach((item: IPRListItem) => {
+        prl.push(item)
+      })
+    })
+
+    spinner = ora({ text: 'Checking PR......', color: 'blue' }).start()
+    for (let i = 0; i < prl.length; i++) {
+      // 循环，根据 pr number 和 仓库名获取 pr 详情
+      const prInfo = await githubApi.getPRByRepo(prl[i].number, prl[i].repo, prl[i].title)
+      // 根据 pr 详情，检测是否可以更新
+      const res = await githubApi.needUpdate(prl[i].repo, prInfo as IPRInfo)
+      log('success', `✔ NO.${i + 1}:Check PR #${prl[i].number} completed`)
+      prListByRepo.push({
+        ...prInfo,
+        isNeedUpdate: res.isNeedUpdate,
+      })
+    }
+    spinner.stop()
+
+    const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
+    spinner = ora({ text: 'Update PR......', color: 'blue' }).start()
+    for (let i = 0; i < prSelectRes.prSelect.length; i++) {
+      if (prSelectRes.prSelect[i].isNeedUpdate) {
+        // await githubApi.updatePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+        log('success', `✔ NO.${i + 1}:update PR #${prl[i].number} completed`)
+      } else {
+        // TODO console.log(prSelectRes.prSelect[i].infoTitle)
+      }
+    }
+    spinner.succeed()
+    log('success', '✔ All PR updates completed')
   }
+
+  // TODO： 選擇的select中那些成功了 哪些沒有
 }

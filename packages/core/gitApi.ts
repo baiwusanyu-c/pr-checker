@@ -63,8 +63,8 @@ export default class GitApi {
 
   /**
    * 根据  pr number 与 repo name 获取 pr 详情
-   * @param pull_number pr 号 TODO：维护 list 批量
-   * @param repo_name 源仓库名 TODO：维护 list 批量
+   * @param pull_number pr 号
+   * @param repo_name 源仓库名
    */
   async getPRByRepo(pull_number: number, repo_name: string, title?: string) {
     try {
