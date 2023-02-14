@@ -18,25 +18,24 @@ export const run = async() => {
   // get git config
   cli.option('-g, --get', 'get git config')
 
-  cli.command('run').action(async() => {
-    runtimeStart(storage as Storage)
+  cli.command('run', 'check your pr').action(async() => {
+    if (!storage.token || !storage.username) {
+      log('error', 'use `pr-checker -t <TOKEN>` to set your token')
+      process.exit(1)
+      return
+    }
+    await runtimeStart(storage as Storage)
   })
   cli.help()
   cli.version(version)
   const parseRes = cli.parse()
   const {
-    u,
-    username,
-    t,
-    token,
-    c,
-    clear,
-    h,
-    help,
-    v,
-    g,
-    get,
-    version: versions,
+    u, username,
+    t, token,
+    c, clear,
+    h, help,
+    v, version: versions,
+    g, get,
   } = parseRes.options
   if (h || help || v || versions)
     return
@@ -72,11 +71,5 @@ export const run = async() => {
     storage.username = u || username
     await saveStorage()
     log('success', 'username set successfully')
-    return
-  }
-
-  if (!storage.token) {
-    log('error', 'use `pr-checker -t <TOKEN>` to set your token')
-    process.exit(1)
   }
 }

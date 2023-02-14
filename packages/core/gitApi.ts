@@ -1,4 +1,10 @@
 import { Octokit } from '@octokit/core'
+export declare interface IPRListItem {
+  title: string
+  number: number
+  repo: string
+  id: number
+}
 export declare interface IPRInfo {
   sha: string
   org_repo: string
@@ -8,6 +14,13 @@ export declare interface IPRInfo {
   pr_repo_default_branch: string
   mergeable: boolean
   merged: boolean
+  title: string
+  number: number
+  repo: string
+}
+
+export declare interface IPRCheckRes extends IPRInfo{
+  isNeedUpdate: boolean
 }
 export default class GitApi {
   octokit: Octokit
@@ -30,7 +43,18 @@ export default class GitApi {
         q: `is:pr is:open author:${username}`,
         per_page: 1000,
       })
-      return data.items
+      const res = {} as Record<string, IPRListItem[]>
+      data.items.forEach((val: any) => {
+        const repo = val.repository_url.split('repos/')[1]
+        if (!res[repo]) res[repo] = []
+        res[repo].push({
+          title: val.title,
+          number: val.number,
+          repo,
+          id: val.id,
+        })
+      })
+      return res
     } catch (error) {
       console.log(error)
       return []
@@ -42,7 +66,7 @@ export default class GitApi {
    * @param pull_number pr 号 TODO：维护 list 批量
    * @param repo_name 源仓库名 TODO：维护 list 批量
    */
-  async getPRByRepo(pull_number: number, repo_name: string) {
+  async getPRByRepo(pull_number: number, repo_name: string, title?: string) {
     try {
       const { data } = await this.octokit.request(
         `GET /repos/${repo_name}/pulls/{pull_number}`,
@@ -59,6 +83,9 @@ export default class GitApi {
         pr_repo_default_branch: data.head.repo.default_branch,
         merged: data.merged,
         mergeable: data.mergeable,
+        number: pull_number,
+        repo: repo_name,
+        title: title || '',
       } as IPRInfo
     } catch (error) {
       // eslint-disable-next-line no-console
