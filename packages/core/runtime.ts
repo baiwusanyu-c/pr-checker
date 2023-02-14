@@ -69,8 +69,8 @@ export async function runtimeStart(store: Storage) {
 }
 
 async function checkPR(prl: IPRListItem[], githubApi: GitApi) {
-  if(prl.length === 0){
-    log('error', `Please select a pr to check`)
+  if (prl.length === 0) {
+    log('error', 'Please select a pr to check')
     process.exit()
   }
   const prListByRepo = []
@@ -94,7 +94,7 @@ async function updatePR(prl: IPRListItem[],
   const updateRes = []
   for (let i = 0; i < prSelectRes.prSelect.length; i++) {
     if (prSelectRes.prSelect[i].isNeedUpdate) {
-      // await githubApi.updatePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+      await githubApi.updatePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
       log('success', `✔ NO.${i + 1}:update PR #${prl[i].number} completed`)
     }
     updateRes.push({
