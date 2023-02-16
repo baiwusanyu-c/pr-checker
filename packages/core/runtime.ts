@@ -19,7 +19,7 @@ export async function runtimeStart(store: Storage) {
   const isAllRepo = await promptsRun(typeOption)
 
   let updateRes = []
-  let spinner = ora({ text: 'Loading Repo......', color: 'blue' }).start()
+  const spinner = ora({ text: 'Loading Repo......', color: 'blue' }).start()
   const githubApi = new GitApi(store.token, store.username!)
   const prList = await githubApi.getPRList()
   spinner.stop()
@@ -30,17 +30,13 @@ export async function runtimeStart(store: Storage) {
     // select repo
     const selectRepo = await promptsRun(createRepoOption(repoList))
     const prl = prList[selectRepo.RepoSelect as keyof typeof prList] as IPRListItem[]
-
     // check pr
-    spinner = ora({ text: `Checking PR by ${selectRepo.RepoSelect}......`, color: 'blue' }).start()
+    log('info', `Checking PR by ${selectRepo.RepoSelect}......`)
     const prListByRepo = await checkPR(prl, githubApi)
-    spinner.stop()
-
     // select pr
     const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
-
     // update pr
-    spinner = ora({ text: `Update PR by ${selectRepo.RepoSelect}......`, color: 'blue' }).start()
+    log('info', `Update PR by ${selectRepo.RepoSelect}......`)
     updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi)
   } else {
     const prl = [] as IPRListItem[]
@@ -49,17 +45,13 @@ export async function runtimeStart(store: Storage) {
         prl.push(item)
       })
     })
-
     // check pr
-    spinner = ora({ text: 'Checking PR......', color: 'blue' }).start()
+    log('info', 'Checking PR......')
     const prListByRepo = await checkPR(prl, githubApi)
-    spinner.stop()
-
     // select pr
     const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
-
     // update pr
-    spinner = ora({ text: 'Update PR......', color: 'blue' }).start()
+    log('info', 'Update PR......')
     updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi)
   }
 
@@ -73,34 +65,32 @@ async function checkPR(prl: IPRListItem[], githubApi: GitApi) {
     log('error', 'Please select a pr to check')
     process.exit()
   }
-  const prListByRepo = []
-  for (let i = 0; i < prl.length; i++) {
-    // get pr detial data
+  const prListByRepo = await Promise.all(createRunList(prl.length, async(i: number) => {
+    // get pr detail data
     const prInfo = await githubApi.getPRByRepo(prl[i].number, prl[i].repo, prl[i].title)
     // need update pr ?
     const res = await githubApi.needUpdate(prl[i].repo, prInfo as IPRInfo)
-    log('success', `✔ NO.${i + 1}:Check PR #${prl[i].number} completed`)
-    prListByRepo.push({
+    log('success', `✔ Check PR #${prl[i].number} completed`)
+    return {
       ...prInfo,
       isNeedUpdate: res.isNeedUpdate,
-    })
-  }
+    }
+  }))
   return prListByRepo
 }
 
 async function updatePR(prl: IPRListItem[],
   prSelectRes: IPRSelect,
   githubApi: GitApi) {
-  const updateRes = []
-  for (let i = 0; i < prSelectRes.prSelect.length; i++) {
+  const updateRes = await Promise.all(createRunList(prl.length, async(i: number) => {
     if (prSelectRes.prSelect[i].isNeedUpdate) {
       await githubApi.updatePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
-      log('success', `✔ NO.${i + 1}:update PR #${prl[i].number} completed`)
+      log('success', `✔ Update PR #${prl[i].number} completed`)
     }
-    updateRes.push({
+    return {
       ...prSelectRes.prSelect[i],
-    })
-  }
+    }
+  }))
   return updateRes
 }
 
@@ -125,4 +115,16 @@ async function printUpdateRes(res: IPRCheckRes[]) {
     })
   })
   p.printTable()
+}
+
+function createRunList(
+  taskNum: number,
+  taskFunc: (index: number) => Promise<Record<any, any>>) {
+  const taskList = [] as Array<Promise<any>>
+  for (let i = 0; i < taskNum; i++) {
+    taskList.push(new Promise((resolve) => {
+      resolve(taskFunc(i))
+    }))
+  }
+  return taskList
 }
