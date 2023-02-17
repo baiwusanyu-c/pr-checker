@@ -49,6 +49,7 @@ export const createPrOption = (list: IPRCheckRes[]) => {
     type: 'multiselect',
     name: 'prSelect',
     message: 'Please select the PR that needs to be updated',
+    optionsPerPage: 20,
     choices: list.map(handler),
-  }] as prompts.PromptObject[]
+  }] as unknown as prompts.PromptObject[]
 }

@@ -10,7 +10,12 @@ import type { Storage } from './storage'
 declare type IPRSelect = Record<string, IPRCheckRes[]>
 
 export const promptsRun = async(option: prompts.PromptObject[]) => {
-  const res = await prompts(option)
+  const res = await prompts(option, {
+    onCancel: () => {
+      log('info', 'Operation cancel')
+      process.exit()
+    },
+  })
   return { ...res }
 }
 
