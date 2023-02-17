@@ -13,6 +13,7 @@ export declare interface IPRInfo {
   pr_repo: string
   pr_repo_default_branch: string
   mergeable: boolean
+  mergeable_state: string
   merged: boolean
   title: string
   number: number
@@ -21,6 +22,7 @@ export declare interface IPRInfo {
 
 export declare interface IPRCheckRes extends IPRInfo{
   isNeedUpdate: boolean
+  reason: string
 }
 export default class GitApi {
   octokit: Octokit
@@ -83,6 +85,7 @@ export default class GitApi {
         pr_repo_default_branch: data.head.repo.default_branch,
         merged: data.merged,
         mergeable: data.mergeable,
+        mergeable_state: data.mergeable_state,
         number: pull_number,
         repo: repo_name,
         title: title || '',
@@ -101,6 +104,9 @@ export default class GitApi {
    */
   async needUpdate(repo_name: string, pr_info: IPRInfo) {
     try {
+      if (pr_info.mergeable_state === 'dirty')
+        return { isNeedUpdate: false, reason: 'code conflict' }
+
       const { data } = await this.octokit.request(
         `GET /repos/${repo_name}/commits`,
       )
@@ -111,14 +117,14 @@ export default class GitApi {
           && !pr_info.merged)
           return { isNeedUpdate: true }
         else
-          return { isNeedUpdate: false }
+          return { isNeedUpdate: false, reason: 'not updated' }
       } else {
-        return { isNeedUpdate: false }
+        return { isNeedUpdate: false, reason: 'unknown error' }
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error)
-      return { isNeedUpdate: false }
+      return { isNeedUpdate: false, reason: 'unknown error' }
     }
   }
 

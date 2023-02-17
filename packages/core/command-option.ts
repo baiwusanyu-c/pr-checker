@@ -40,6 +40,7 @@ export const createPrOption = (list: IPRCheckRes[]) => {
         number: item.number,
         repo: item.repo,
         isNeedUpdate: item.isNeedUpdate,
+        reason: item.reason,
         infoTitle,
       },
     }

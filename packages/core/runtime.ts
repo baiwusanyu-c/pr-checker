@@ -73,7 +73,7 @@ async function checkPR(prl: IPRListItem[], githubApi: GitApi) {
     log('success', `✔ Check PR #${prl[i].number} completed`)
     return {
       ...prInfo,
-      isNeedUpdate: res.isNeedUpdate,
+      ...res,
     }
   }))
   return prListByRepo
@@ -100,6 +100,7 @@ async function printUpdateRes(res: IPRCheckRes[]) {
       { name: 'number', alignment: 'left' },
       { name: 'can merge', alignment: 'left' },
       { name: 'success', alignment: 'left' },
+      { name: 'reason', alignment: 'left' },
       { name: 'repo', alignment: 'left' },
       { name: 'title', alignment: 'left' },
     ],
@@ -110,6 +111,9 @@ async function printUpdateRes(res: IPRCheckRes[]) {
       'number': chalk.greenBright.bold(`#${item.number}`),
       'can merge': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
       'success': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
+      'reason': item.isNeedUpdate
+        ? chalk.blueBright.bold('-')
+        : item.reason === 'not updated' ? chalk.blueBright.bold(item.reason) : chalk.yellowBright.bold(item.reason),
       'repo': chalk.blueBright.bold(`<${item.repo}>`),
       'title': item.title,
     })
