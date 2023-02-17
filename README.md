@@ -1,5 +1,5 @@
 
-# 🚀 PR-Checker
+# 🚀 PR-Checker test
 
 Detect and update your Pull Requests in batches
 
