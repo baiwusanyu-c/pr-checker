@@ -51,5 +51,14 @@ export const createPrOption = (list: IPRCheckRes[]) => {
     message: 'Please select the PR that needs to be updated',
     optionsPerPage: 20,
     choices: list.map(handler),
+    onRender() {
+      // @ts-expect-error rewrite output see: https://github.com/terkelg/prompts/issues/389
+      if (this.firstRender) {
+        // @ts-expect-error rewrite output see: https://github.com/terkelg/prompts/issues/389
+        this.renderDoneOrInstructions = function() {
+          return ''
+        }
+      }
+    },
   }] as unknown as prompts.PromptObject[]
 }
