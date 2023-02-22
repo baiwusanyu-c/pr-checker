@@ -1,6 +1,6 @@
 import { existsSync, promises as fs } from 'fs'
 import { resolve } from 'path'
-import { tmpdir } from 'os'
+import { homedir } from 'os'
 
 export interface Storage {
   lastRunCommand?: string
@@ -10,12 +10,13 @@ export interface Storage {
 
 let storage: Storage | undefined
 
-const storageDir = resolve(tmpdir(), 'pr-storage')
-const storagePath = resolve(storageDir, '_pr_storage.json')
+const storageDir = resolve(homedir(), 'pr-checker-storage')
+const storagePath = resolve(storageDir, '_pr_checker_storage.json')
 
 export async function loadStorage(
   fn?: (storage: Storage) => Promise<boolean> | boolean,
 ) {
+  console.log(storagePath)
   if (!storage) {
     storage = existsSync(storagePath)
       ? JSON.parse((await fs.readFile(storagePath, 'utf-8')) || '{}') || {}
