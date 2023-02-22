@@ -2,7 +2,7 @@
 import { readFileSync } from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-
+// test
 const msgPath = path.resolve('.git/COMMIT_EDITMSG')
 const msg = readFileSync(msgPath, 'utf-8').trim()
 
