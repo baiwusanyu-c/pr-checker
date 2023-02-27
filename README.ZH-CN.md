@@ -109,6 +109,21 @@ Instructions:
 │ #6224  │ true      │ true    │ <vuejs/core> │ feat(runtime-core): Update rendering error caused by shallow copy #6221                        │     
 └────────┴───────────┴─────────┴──────────────┴────────────────────────────────────────────────────────────────────────────────────────────────┘  
 ```
+### 其他
+#### -v ｜ --version
+显示版本信息
+
+```` shell
+pr-checker -v
+````
+
+#### -h ｜ --help
+显示帮助信息
+
+```` shell
+pr-checker -h
+````
+
 ## 快照
 <img src="./public/img1.png" alt="Detect and update your Pull Requests in batches"/>
 <img src="./public/img2.png" alt="Detect and update your Pull Requests in batches"/>
