@@ -109,6 +109,21 @@ After the last update is completed, those that do not meet the update conditions
 │ #6224  │ true      │ true    │ <vuejs/core> │ feat(runtime-core): Update rendering error caused by shallow copy #6221                        │     
 └────────┴───────────┴─────────┴──────────────┴────────────────────────────────────────────────────────────────────────────────────────────────┘  
 ```
+### Other
+#### -v ｜ --version
+Display version message
+
+```` shell
+pr-checker -v
+````
+
+#### -h ｜ --help
+Display help message
+
+```` shell
+pr-checker -h
+````
+
 ## Screenshot
 <img src="./public/img1.png" alt="Detect and update your Pull Requests in batches"/>
 <img src="./public/img2.png" alt="Detect and update your Pull Requests in batches"/>
