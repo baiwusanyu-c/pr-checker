@@ -3,14 +3,7 @@ import * as path from 'path'
 import { dest, parallel, src } from 'gulp'
 import { relativeDir } from './utils'
 import { distDirMap } from './contant'
-/**
- * Define the replacement dependency path here,
- * the path is the dist directory to the directory corresponding to the real file.
- * In monorepo, you may not want each sub-repository to be published separately on npm,
- * and you don't want to package all the code together,
- * but the directory structure of the packaged product may be the same as your single-repository structure,
- * so after the packaging is completed, we Dependency paths need to be replaced
- */
+
 const formatList = [
   { runPath: path.resolve(process.cwd(), 'dist/**/*.js'), format: '.js' },
   { runPath: path.resolve(process.cwd(), 'dist/**/*.cjs'), format: '.cjs' },
