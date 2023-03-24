@@ -19,11 +19,15 @@ export const run = async() => {
   cli.option('-g, --get', 'get git config')
 
   cli.command('run', 'check your pr').action(async() => {
-    if (!storage.token || !storage.username) {
+    if (!storage.token) {
       log('error', 'use `pr-checker -t <TOKEN>` to set your token')
       process.exit(1)
-      return
     }
+    if (!storage.username) {
+      log('error', 'use `pr-checker -u <USERNAME>` to set your username')
+      process.exit(1)
+    }
+
     await runtimeStart(storage as Storage)
   })
   cli.help()
