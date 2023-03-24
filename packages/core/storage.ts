@@ -1,4 +1,4 @@
-import { existsSync, promises as fs } from 'fs'
+import { existsSync, promises as fs, mkdirSync } from 'fs'
 import { resolve } from 'path'
 import { homedir } from 'os'
 
@@ -10,7 +10,21 @@ export interface Storage {
 
 let storage: Storage | undefined
 
-const storageDir = resolve(homedir(), 'pr-checker-storage')
+const storageDir = (() => {
+  const home = homedir()
+  const oldPath = resolve(home, 'pr-checker-storage')
+
+  if (existsSync(oldPath)) return oldPath
+
+  const dotPath = resolve(home, '.config/pr-checker-storage')
+  if (!existsSync(dotPath)) {
+    mkdirSync(dotPath, {
+      recursive: true,
+    })
+  }
+  return dotPath
+})()
+
 const storagePath = resolve(storageDir, '_pr_checker_storage.json')
 
 export async function loadStorage(
@@ -23,8 +37,7 @@ export async function loadStorage(
       : {}
   }
 
-  if (fn)
-    if (await fn(storage!)) await saveStorage()
+  if (fn) if (await fn(storage!)) await saveStorage()
 
   return storage!
 }
