@@ -149,3 +149,11 @@ export default class GitApi {
     }
   }
 }
+
+export async function getUserName(token: string) {
+  const octokit = new Octokit({
+    auth: token,
+  })
+  const { data } = await octokit.request('GET /user')
+  return data
+}

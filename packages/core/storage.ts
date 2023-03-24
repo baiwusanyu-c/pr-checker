@@ -16,7 +16,6 @@ const storagePath = resolve(storageDir, '_pr_checker_storage.json')
 export async function loadStorage(
   fn?: (storage: Storage) => Promise<boolean> | boolean,
 ) {
-  console.log(storagePath)
   if (!storage) {
     storage = existsSync(storagePath)
       ? JSON.parse((await fs.readFile(storagePath, 'utf-8')) || '{}') || {}
