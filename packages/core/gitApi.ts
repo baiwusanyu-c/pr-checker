@@ -27,12 +27,13 @@ export declare interface IPRCheckRes extends IPRInfo{
 export default class GitApi {
   octokit: Octokit
   owner: string
-
+  forkRepoCache: Record<string, Record<'sha', string>>
   constructor(token: string, owner: string) {
     this.octokit = new Octokit({
       auth: token,
     })
     this.owner = owner
+    this.forkRepoCache = {}
   }
 
   /**
@@ -64,9 +65,10 @@ export default class GitApi {
   }
 
   /**
-   * 根据  pr number 与 repo name 获取 pr 详情
+   * Get pr details according to pr number and repo name
    * @param pull_number pr 号
-   * @param repo_name 源仓库名
+   * @param repo_name upstream Repo name
+   * @param title
    */
   async getPRByRepo(pull_number: number, repo_name: string, title?: string) {
     try {
@@ -76,13 +78,28 @@ export default class GitApi {
           pull_number,
         },
       )
+
+      const forkRepoName = data.head.repo.full_name
+      const forkRepoDefaultBranch = data.head.repo.default_branch
+      if (!this.forkRepoCache[forkRepoName]) {
+        const { data: forkRepoData } = await this.octokit.request(
+          `GET /repos/${forkRepoName}/branches/{default_branch_name}`,
+          {
+            default_branch_name: forkRepoDefaultBranch,
+          },
+        )
+        this.forkRepoCache[forkRepoName] = {
+          sha: forkRepoData.commit.sha,
+        }
+      }
+
       return {
-        sha: data.base.sha,
+        sha: this.forkRepoCache[forkRepoName].sha, // Fork warehouse default branch hash
         org_repo: data.base.repo.full_name,
         org_repo_default_branch: data.base.repo.default_branch,
         pr_sha: data.head.sha,
-        pr_repo: data.head.repo.full_name,
-        pr_repo_default_branch: data.head.repo.default_branch,
+        pr_repo: forkRepoName,
+        pr_repo_default_branch: forkRepoDefaultBranch,
         merged: data.merged,
         mergeable: data.mergeable,
         mergeable_state: data.mergeable_state,
@@ -98,9 +115,9 @@ export default class GitApi {
   }
 
   /**
-   * 判断 pr 是否要同步源仓库
-   * @param repo_name 源仓库名
-   * @param pr_info 该 pr 版本中， fork 的仓库提交 hash
+   * Determine whether pr wants to synchronize the upstream Repo
+   * @param repo_name upstream Repo name
+   * @param pr_info The getPRByRepo function returns the result
    */
   async needUpdate(repo_name: string, pr_info: IPRInfo) {
     try {
@@ -110,7 +127,10 @@ export default class GitApi {
       const { data } = await this.octokit.request(
         `GET /repos/${repo_name}/commits`,
       )
+
       if (data.length >= 0) {
+        // Comparison of the default branch hash of
+        // the fork warehouse and the upstream warehouse hash
         const cur_sha = data[0].sha
         if (pr_info.sha !== cur_sha
           && pr_info.mergeable
@@ -129,7 +149,7 @@ export default class GitApi {
   }
 
   /**
-   * 更新pr
+   * update pr
    * @param pull_number
    * @param repo_name
    */
