@@ -30,6 +30,14 @@ yarn install pr-checker --global
 
 #### 2.运行命令 `pr-checker`
 
+
+首次使用请设置 GitHub Token 和用户名。请设置 GitHub Token 和用户名。
+
+```bash
+pr-checker -t #<GH_TOKEN>
+pr-checker -u #<GH_USERNAME>
+```
+
 ```` shell
 pr-checker run
 ````
@@ -43,7 +51,7 @@ pr-checker run
 
 ````
 
-#### 4. 选择你仓库(如果你选择了 `Detect the PR of a certain Repo`)
+#### 4. 选择你仓库 (如果你选择了 `Detect the PR of a certain Repo`)
 
 ```` shell
 ? Please select a Repo » - Use arrow-keys. Return to submit.

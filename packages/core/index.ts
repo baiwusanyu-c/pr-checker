@@ -23,7 +23,6 @@ export const run = async() => {
     if (!storage.token) {
       log('error', 'use `pr-checker -t <TOKEN>` to set your token')
       process.exit(1)
-      return
     }
 
     if (!storage.username) {
