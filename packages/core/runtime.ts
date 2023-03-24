@@ -1,6 +1,6 @@
 import prompts from 'prompts'
 import ora from 'ora'
-import { log } from '@pr-checker/utils'
+import { isEmptyObj, log } from '@pr-checker/utils'
 import { Table } from 'console-table-printer'
 import chalk from 'chalk'
 import { createPrOption, createRepoOption, typeOption } from './command-option'
@@ -88,7 +88,7 @@ async function updatePR(prl: IPRListItem[],
   prSelectRes: IPRSelect,
   githubApi: GitApi) {
   const updateRes = await Promise.all(createRunList(prl.length, async(i: number) => {
-    if (prSelectRes.prSelect[i].isNeedUpdate) {
+    if (prSelectRes.prSelect[i] && prSelectRes.prSelect[i].isNeedUpdate) {
       await githubApi.updatePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
       log('success', `✔ Update PR #${prl[i].number} completed`)
     }
@@ -112,16 +112,18 @@ async function printUpdateRes(res: IPRCheckRes[]) {
   })
   res.sort((a, b) => Number(a.isNeedUpdate) - Number(b.isNeedUpdate))
   res.forEach((item) => {
-    p.addRow({
-      'number': chalk.greenBright.bold(`#${item.number}`),
-      'can merge': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
-      'success': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
-      'reason': item.isNeedUpdate
-        ? chalk.blueBright.bold('-')
-        : item.reason === 'not updated' ? chalk.blueBright.bold(item.reason) : chalk.yellowBright.bold(item.reason),
-      'repo': chalk.blueBright.bold(`<${item.repo}>`),
-      'title': item.title,
-    })
+    if (!isEmptyObj(item)) {
+      p.addRow({
+        'number': chalk.greenBright.bold(`#${item.number}`),
+        'can merge': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
+        'success': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
+        'reason': item.isNeedUpdate
+          ? chalk.blueBright.bold('-')
+          : item.reason === 'not updated' ? chalk.blueBright.bold(item.reason) : chalk.yellowBright.bold(item.reason),
+        'repo': chalk.blueBright.bold(`<${item.repo}>`),
+        'title': item.title,
+      })
+    }
   })
   p.printTable()
 }
