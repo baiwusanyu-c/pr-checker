@@ -45,8 +45,8 @@
   "scripts": {
     "init": "pnpm i",
     "lint:fix": "eslint --fix ./ --ext .vue,.js,.ts,.jsx,.tsx,.json ",
-    "dev": "cross-env RUNTIME_ENV=development esno watch play/index.ts",
-    "build": "cross-env RUNTIME_ENV=production pnpm run --filter @pr-checker/build build",
+    "dev": "pnpm run --filter @pr-checker/play play",
+    "build": "pnpm run --filter @pr-checker/build build",
     "prepublishOnly": "pnpm run build",
     "release": "bumpp package.json --commit --push --tag",
     "publish": "pnpm run release && pnpm run prepublishOnly && cd dist && pnpm run publish",
