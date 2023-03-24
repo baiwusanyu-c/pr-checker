@@ -4,6 +4,7 @@ import { cac } from 'cac'
 import { version } from '../../package.json'
 import { clearStorage, loadStorage, saveStorage } from './storage'
 import { runtimeStart } from './runtime'
+import { getUserName } from './gitApi'
 import type { Storage } from './storage'
 const cli = cac('pr-checker')
 export const run = async() => {
@@ -23,11 +24,13 @@ export const run = async() => {
       log('error', 'use `pr-checker -t <TOKEN>` to set your token')
       process.exit(1)
     }
-    if (!storage.username) {
-      log('error', 'use `pr-checker -u <USERNAME>` to set your username')
-      process.exit(1)
-    }
 
+    if (!storage.username) {
+      log('info', 'You have not set a username, '
+        + 'it has been automatically set for you according to the token')
+      const { login } = await getUserName(storage.token)
+      await setUserName(login)
+    }
     await runtimeStart(storage as Storage)
   })
   cli.help()
@@ -72,8 +75,12 @@ export const run = async() => {
 
   // set username
   if ((u && typeof u === 'string') || (username && typeof username === 'string')) {
-    storage.username = u || username
-    await saveStorage()
+    await setUserName()
     log('success', 'username set successfully')
+  }
+
+  async function setUserName(name?: string) {
+    storage.username = name || u || username
+    await saveStorage()
   }
 }

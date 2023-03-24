@@ -1,3 +1,4 @@
+/*
 
 import { cac } from 'cac'
 const cli = cac('pr-checker')
@@ -18,3 +19,6 @@ cli.help()
 cli.version('0.0.0')
 const asd = cli.parse()
 console.log(asd.options.t)
+*/
+import { run } from '@pr-checker/entry'
+run()
