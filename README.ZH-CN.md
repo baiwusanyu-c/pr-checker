@@ -30,14 +30,20 @@ yarn install pr-checker --global
 
 #### 2.运行命令 `pr-checker`
 
-
-首次使用请设置 GitHub Token 和用户名。请设置 GitHub Token 和用户名。
-
+* 设置你的 GitHub Token  
+> 首次使用请设置 GitHub Token
 ```bash
-pr-checker -t #<GH_TOKEN>
-pr-checker -u #<GH_USERNAME>
+pr-checker -t #<GH_TOKEN> // set github token
 ```
 
+* 首次使用请设置 GitHub用户名。
+> v1.1.1 版本以及更低的版本首次使用需要设置 GitHub 用户名  
+v1.1.1以上版本会根据 GitHub Token 自动设置用户名
+```bash
+pr-checker -u #<GH_USERNAME> // set github username
+```
+
+* 运行 run 命令来检查你的 pr
 ```` shell
 pr-checker run
 ````
