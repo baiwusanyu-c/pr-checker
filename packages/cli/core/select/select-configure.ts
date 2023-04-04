@@ -1,6 +1,8 @@
 import chalk from 'chalk'
-import type { IPRCheckRes } from './git-api'
-import type * as prompts from 'prompts'
+import { log } from '@pr-checker/utils'
+import prompts from 'prompts'
+import type { IPRCheckRes } from '@pr-checker/utils/git-api'
+import type * as promptsType from 'prompts'
 export const typeOption = [{
   type: 'select',
   name: 'typeSelect',
@@ -11,7 +13,7 @@ export const typeOption = [{
       value = 'select'
     return { title: item, value }
   }),
-}] as prompts.PromptObject[]
+}] as promptsType.PromptObject[]
 
 export const createRepoOption = (list: string[]) => {
   const handler = (item: string) => {
@@ -22,7 +24,7 @@ export const createRepoOption = (list: string[]) => {
     name: 'RepoSelect',
     message: 'Please select a Repo',
     choices: list.map(handler),
-  }] as prompts.PromptObject[]
+  }] as promptsType.PromptObject[]
 }
 
 export const createPrOption = (list: IPRCheckRes[]) => {
@@ -61,4 +63,14 @@ export const createPrOption = (list: IPRCheckRes[]) => {
       }
     },
   }] as unknown as prompts.PromptObject[]
+}
+
+export const promptsRun = async(option: prompts.PromptObject[]) => {
+  const res = await prompts(option, {
+    onCancel: () => {
+      log('info', 'Operation cancel')
+      process.exit()
+    },
+  })
+  return { ...res }
 }

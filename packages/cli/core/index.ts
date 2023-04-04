@@ -1,13 +1,20 @@
 import * as process from 'process'
 import { log } from '@pr-checker/utils'
 import { cac } from 'cac'
+import { getUserName } from '@pr-checker/utils/git-api'
 import { version } from '../../../package.json'
-import { clearStorage, loadStorage, saveStorage } from './storage'
-import { runtimeStart } from './runtime'
-import { getUserName } from './git-api'
-import type { Storage } from './storage'
-const cli = cac('pr-checker')
+import { loadStorage, saveStorage } from './store/storage'
+import { handleSelect } from './select/handle-select'
+import { handleOption } from './option/handle-option'
+import type { Storage } from './store/storage'
+
 export const run = async() => {
+  const cliInst = await initCli()
+  await handleOption(cliInst.parse())
+}
+
+async function initCli() {
+  const cli = cac('pr-checker')
   // load storage
   const storage = await loadStorage()
   // set github token
@@ -27,60 +34,14 @@ export const run = async() => {
 
     if (!storage.username) {
       log('info', 'You have not set a username, '
-        + 'it has been automatically set for you according to the token')
+          + 'it has been automatically set for you according to the token')
       const { login } = await getUserName(storage.token)
-      await setUserName(login)
+      storage.username = login
+      await saveStorage()
     }
-    await runtimeStart(storage as Storage)
+    await handleSelect(storage as Storage)
   })
   cli.help()
   cli.version(version)
-  const parseRes = cli.parse()
-  const {
-    u, username,
-    t, token,
-    c, clear,
-    h, help,
-    v, version: versions,
-    g, get,
-  } = parseRes.options
-  if (h || help || v || versions)
-    return
-
-  // clear token and username
-  if (c || clear) {
-    if (storage) {
-      await clearStorage()
-      log('success', 'clear token and username successfully')
-      return
-    }
-  }
-
-  // get git config
-  if (g || get) {
-    if (storage) {
-      log('info', `username: ${storage.username || 'null'}`)
-      log('info', `token: ${storage.token || 'null'}`)
-      return
-    }
-  }
-
-  // set git token
-  if ((t && typeof t === 'string') || (token && typeof token === 'string')) {
-    storage.token = t || token
-    await saveStorage()
-    log('success', 'token set successfully')
-    return
-  }
-
-  // set username
-  if ((u && typeof u === 'string') || (username && typeof username === 'string')) {
-    await setUserName()
-    log('success', 'username set successfully')
-  }
-
-  async function setUserName(name?: string) {
-    storage.username = name || u || username
-    await saveStorage()
-  }
+  return cli
 }
