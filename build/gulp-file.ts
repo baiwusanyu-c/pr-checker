@@ -2,17 +2,9 @@ import path from 'path'
 import { series } from 'gulp'
 import fs from 'fs-extra'
 import pkg from '../package.json'
-import { run } from './utils'
 import { parallelTask } from './rewirte-path'
-import { entry } from './contant'
 
 const distRoot = path.resolve(process.cwd(), '../dist')
-
-const moveDistToRoot = async() => {
-  const distPathInBuild = path.resolve(process.cwd(), 'dist')
-  await fs.copySync(distPathInBuild, distRoot)
-}
-
 const movePkgToRootDist = async() => {
   const content = JSON.parse(JSON.stringify(pkg))
   Reflect.deleteProperty(content, 'scripts')
@@ -21,13 +13,8 @@ const movePkgToRootDist = async() => {
   Reflect.deleteProperty(content, 'eslintConfig')
   content.type = 'module'
   content.scripts = {
-    publish: 'pnpm publish --no-git-checks --access public',
-  }
-  content.files = []
-  // 寫入 files
-  for (const key in entry) {
-    if (key !== 'index')
-      content.files.push(key)
+    'publish:cli': 'pnpm publish --no-git-checks --access public',
+    'publish:ext': 'pnpm publish --no-git-checks --access public',
   }
   await fs.writeJson(`${distRoot}/package.json`, content, { spaces: 2 })
 }
@@ -39,8 +26,6 @@ const moveReadMeToRootDist = async() => {
 
 export default series(
   ...parallelTask(),
-  // 移动dist
-  async() => { await moveDistToRoot() },
   // 移动 package.json 到 dist
   async() => {
     const res = await movePkgToRootDist()
@@ -51,6 +36,4 @@ export default series(
     const res = await moveReadMeToRootDist()
     return res
   },
-  // 删build目录下dist
-  async() => { await run('pnpm run --filter @pr-checker/build clean') },
 )

@@ -7,12 +7,11 @@
   "license": "ISC",
   "author": "",
   "scripts": {
-    "build": "cross-env tsup-node --config index.ts && pnpm run rewrite",
+    "build": "cross-env tsup-node --config tsup-build.ts && pnpm run rewrite",
     "rewrite": "gulp -require sucrase/register/ts -f gulp-file.ts",
     "clean": "rimraf dist"
   },
   "devDependencies": {
-    "@pr-checker/entry": "workspace:*",
     "cross-env": "^7.0.3",
     "rimraf": "^3.0.2",
     "sucrase": "^3.21.0",

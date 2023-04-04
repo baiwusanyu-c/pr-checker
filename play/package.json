@@ -19,6 +19,5 @@
   },
 
   "devDependencies": {
-    "@pr-checker/entry": "workspace:*"
   }
 }

@@ -2,7 +2,7 @@
 /build/node_modules/
 /node_modules/
 /packages/entry/node_modules/
-/packages/core/node_modules/
+/packages/cli/core/node_modules/
 /play/node_modules/
 /utils/node_modules/
 dist

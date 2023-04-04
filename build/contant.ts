@@ -1,12 +1,15 @@
-export const entry = {
-  index: '../packages/entry/index.ts',
-  core: '../packages/core/index.ts',
-  bin: '../packages/bin/index.ts',
-  utils: '../utils/index.ts',
+export const CLI_ENTRY = {
+  'cli/core': '../packages/cli/core/index.ts',
+  'cli/bin': '../packages/cli/bin/index.ts',
+  'cli/utils': '../utils/index.ts',
 }
 
-export const distDirMap = {
-  '@pr-checker/utils': 'dist/utils/index[format]',
-  '@pr-checker/core': 'dist/core/index[format]',
-  '@pr-checker/bin': 'dist/bin/index[format]',
+export const CLI_DIR_MAP = {
+  '@pr-checker/utils': '../dist/cli/utils/index[format]',
+  '@pr-checker/core': '../dist/cli/core/index[format]',
+}
+
+export const EXT_ENTRY = {
+  'extension/core': '../packages/extension/index.ts',
+  'extension/utils': '../utils/index.ts',
 }

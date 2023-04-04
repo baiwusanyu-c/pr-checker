@@ -2,12 +2,11 @@ import * as process from 'process'
 import * as path from 'path'
 import { dest, parallel, src } from 'gulp'
 import { relativeDir } from './utils'
-import { distDirMap } from './contant'
+import { CLI_DIR_MAP } from './contant'
 
 const formatList = [
   { runPath: path.resolve(process.cwd(), 'dist/**/*.js'), format: '.js' },
   { runPath: path.resolve(process.cwd(), 'dist/**/*.cjs'), format: '.cjs' },
-  { runPath: path.resolve(process.cwd(), 'dist/**/*.d.ts'), format: '' },
 ]
 
 export const parallelTask = () => {
@@ -20,11 +19,11 @@ export const parallelTask = () => {
           let content = fileData.contents.toString()
           // 当前读取的文件路径
           const filePath = fileData.path.replaceAll('\\', '/')
-          for (const distDirMapKey in distDirMap) {
+          for (const distDirMapKey in CLI_DIR_MAP) {
             // 生产要替换的依赖路径 @xxxx ->  ../xxxx
             let targetPath = path.resolve(
               process.cwd(),
-              distDirMap[distDirMapKey as keyof typeof distDirMap])
+              CLI_DIR_MAP[distDirMapKey as keyof typeof CLI_DIR_MAP])
             // 替换格式后缀 .[format] -> .js / .cjs
             targetPath = targetPath.replace('[format]', formatVal.format)
             targetPath = targetPath.replaceAll('\\', '/')
