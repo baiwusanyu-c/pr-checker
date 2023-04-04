@@ -4,8 +4,8 @@ import { isEmptyObj, log } from '@pr-checker/utils'
 import { Table } from 'console-table-printer'
 import chalk from 'chalk'
 import { createPrOption, createRepoOption, typeOption } from './command-option'
-import GitApi from './gitApi'
-import type { IPRCheckRes, IPRInfo, IPRListItem } from './gitApi'
+import GitApi from './git-api'
+import type { IPRCheckRes, IPRInfo, IPRListItem } from './git-api'
 import type { Storage } from './storage'
 declare type IPRSelect = Record<string, IPRCheckRes[]>
 

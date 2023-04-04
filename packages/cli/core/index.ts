@@ -1,10 +1,10 @@
 import * as process from 'process'
 import { log } from '@pr-checker/utils'
 import { cac } from 'cac'
-import { version } from '../../package.json'
+import { version } from '../../../package.json'
 import { clearStorage, loadStorage, saveStorage } from './storage'
 import { runtimeStart } from './runtime'
-import { getUserName } from './gitApi'
+import { getUserName } from './git-api'
 import type { Storage } from './storage'
 const cli = cac('pr-checker')
 export const run = async() => {

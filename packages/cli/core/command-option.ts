@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import type { IPRCheckRes } from './gitApi'
+import type { IPRCheckRes } from './git-api'
 import type * as prompts from 'prompts'
 export const typeOption = [{
   type: 'select',

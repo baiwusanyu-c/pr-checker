@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { run } from '../entry'
+import { run } from '../core'
 const start = async() => {
   try {
     await run()
