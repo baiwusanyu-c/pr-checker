@@ -24,7 +24,7 @@ export declare interface IPRCheckRes extends IPRInfo{
   isNeedUpdate: boolean
   reason: string
 }
-export default class GitApi {
+export class GitApi {
   octokit: Octokit
   owner: string
   forkRepoCache: Record<string, Record<'sha', string>>

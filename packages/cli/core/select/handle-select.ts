@@ -1,25 +1,14 @@
-import prompts from 'prompts'
+
 import ora from 'ora'
-import { isEmptyObj, log } from '@pr-checker/utils'
+import { GitApi, createRunList, isEmptyObj, log } from '@pr-checker/utils'
 import { Table } from 'console-table-printer'
 import chalk from 'chalk'
-import { createPrOption, createRepoOption, typeOption } from './command-option'
-import GitApi from './git-api'
-import type { IPRCheckRes, IPRInfo, IPRListItem } from './git-api'
-import type { Storage } from './storage'
+import { createPrOption, createRepoOption, promptsRun, typeOption } from './select-configure'
+import type { IPRCheckRes, IPRInfo, IPRListItem } from '@pr-checker/utils/git-api'
+import type { Storage } from '../store/storage'
 declare type IPRSelect = Record<string, IPRCheckRes[]>
 
-export const promptsRun = async(option: prompts.PromptObject[]) => {
-  const res = await prompts(option, {
-    onCancel: () => {
-      log('info', 'Operation cancel')
-      process.exit()
-    },
-  })
-  return { ...res }
-}
-
-export async function runtimeStart(store: Storage) {
+export async function handleSelect(store: Storage) {
   // select type ( all Repo ?)
   const isAllRepo = await promptsRun(typeOption)
 
@@ -126,16 +115,4 @@ async function printUpdateRes(res: IPRCheckRes[]) {
     }
   })
   p.printTable()
-}
-
-function createRunList(
-  taskNum: number,
-  taskFunc: (index: number) => Promise<Record<any, any>>) {
-  const taskList = [] as Array<Promise<any>>
-  for (let i = 0; i < taskNum; i++) {
-    taskList.push(new Promise((resolve) => {
-      resolve(taskFunc(i))
-    }))
-  }
-  return taskList
 }
