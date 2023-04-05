@@ -19,5 +19,6 @@
   },
 
   "devDependencies": {
+    "@pr-checker/cli": "workspace:*"
   }
 }

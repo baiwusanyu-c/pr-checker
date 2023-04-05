@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { log } from '@pr-checker/utils'
+import { formatEllipsis, log } from '@pr-checker/utils'
 import prompts from 'prompts'
 import type { IPRCheckRes } from '@pr-checker/utils/git-api'
 import type * as promptsType from 'prompts'
@@ -29,11 +29,11 @@ export const createRepoOption = (list: string[]) => {
 
 export const createPrOption = (list: IPRCheckRes[]) => {
   const handler = (item: IPRCheckRes) => {
-    const repo = chalk.blueBright.bold(`[${item.repo}]`)
+    const repo = chalk.blueBright.bold(`[${formatEllipsis(item.repo)}]`)
     const number = chalk.yellowBright.bold(`[#${item.number}]`)
-    const title = `${item.title}`
+    const title = formatEllipsis(`${item.title}`, 36)
     const canMerge = item.isNeedUpdate
-      ? chalk.yellowBright.bold('<CanMerge:true>') : chalk.redBright.bold('<CanMerge:false>')
+      ? chalk.yellowBright.bold('<can merge>') : chalk.redBright.bold(`<can\`t merge:${item.reason}>`)
     const infoTitle = `${canMerge}: ${repo}-${number} -> ${title}`
     return {
       title: infoTitle,

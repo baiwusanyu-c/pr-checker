@@ -3,14 +3,14 @@ import type { TLog } from './types'
 
 export const log = (type: TLog, msg: string) => {
   if (type === 'info')
-    console.log(chalk.blueBright.bold(`${msg}`))
+    console.log(chalk.blueBright.bold(`[pr-checker]:${msg}`))
 
   if (type === 'error')
-    console.log(chalk.redBright.bold(`${msg}`))
+    console.log(chalk.redBright.bold(`[pr-checker]:${msg}`))
 
   if (type === 'warning')
-    console.log(chalk.yellowBright.bold(`${msg}`))
+    console.log(chalk.yellowBright.bold(`[pr-checker]:${msg}`))
 
   if (type === 'success')
-    console.log(chalk.greenBright.bold(`${msg}`))
+    console.log(chalk.greenBright.bold(`[pr-checker]:${msg}`))
 }

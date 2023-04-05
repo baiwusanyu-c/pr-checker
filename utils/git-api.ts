@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/core'
+import { log } from '@pr-checker/utils'
 export declare interface IPRListItem {
   title: string
   number: number
@@ -27,13 +28,11 @@ export declare interface IPRCheckRes extends IPRInfo{
 export class GitApi {
   octokit: Octokit
   owner: string
-  forkRepoCache: Record<string, Record<'sha', string>>
   constructor(token: string, owner: string) {
     this.octokit = new Octokit({
       auth: token,
     })
     this.owner = owner
-    this.forkRepoCache = {}
   }
 
   /**
@@ -57,9 +56,15 @@ export class GitApi {
           id: val.id,
         })
       })
+      if (!data.items || (data.items && data.items.length === 0))
+        log('error', 'You don\'t have any pull requests that are open')
+
       return res
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      if (error.status === 401)
+        log('error', 'Your token is invalid or does not match your username')
+
+      log('error', error)
       return []
     }
   }
@@ -79,27 +84,13 @@ export class GitApi {
         },
       )
 
-      const forkRepoName = data.head.repo.full_name
-      const forkRepoDefaultBranch = data.head.repo.default_branch
-      if (!this.forkRepoCache[forkRepoName]) {
-        const { data: forkRepoData } = await this.octokit.request(
-          `GET /repos/${forkRepoName}/branches/{default_branch_name}`,
-          {
-            default_branch_name: forkRepoDefaultBranch,
-          },
-        )
-        this.forkRepoCache[forkRepoName] = {
-          sha: forkRepoData.commit.sha,
-        }
-      }
-
       return {
-        sha: this.forkRepoCache[forkRepoName].sha, // Fork warehouse default branch hash
+        sha: data.base.sha, // Fork warehouse default branch hash
         org_repo: data.base.repo.full_name,
         org_repo_default_branch: data.base.repo.default_branch,
         pr_sha: data.head.sha,
-        pr_repo: forkRepoName,
-        pr_repo_default_branch: forkRepoDefaultBranch,
+        pr_repo: data.head.repo.default_branch,
+        pr_repo_default_branch: data.head.repo.default_branch,
         merged: data.merged,
         mergeable: data.mergeable,
         mergeable_state: data.mergeable_state,
@@ -107,9 +98,8 @@ export class GitApi {
         repo: repo_name,
         title: title || '',
       } as IPRInfo
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    } catch (error: any) {
+      log('error', error)
       return {}
     }
   }
@@ -135,15 +125,14 @@ export class GitApi {
         if (pr_info.sha !== cur_sha
           && pr_info.mergeable
           && !pr_info.merged)
-          return { isNeedUpdate: true }
+          return { isNeedUpdate: true, reason: '--' }
         else
           return { isNeedUpdate: false, reason: 'not updated' }
       } else {
         return { isNeedUpdate: false, reason: 'unknown error' }
       }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    } catch (error: any) {
+      log('error', error)
       return { isNeedUpdate: false, reason: 'unknown error' }
     }
   }
@@ -162,9 +151,8 @@ export class GitApi {
         },
       )
       return res.data.message
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    } catch (error: any) {
+      log('error', error)
       return {}
     }
   }
