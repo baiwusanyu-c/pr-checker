@@ -24,7 +24,8 @@
   "files": [
     "cli",
     "README.ZH-CN.md",
-    "README.md"
+    "README.md",
+    "package.json"
   ],
   "bin": {
     "pr-checker": "cli/bin/index.js"
