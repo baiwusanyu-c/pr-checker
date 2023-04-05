@@ -20,5 +20,5 @@ cli.version('0.0.0')
 const asd = cli.parse()
 console.log(asd.options.t)
 */
-import { run } from '@pr-checker/entry'
+import { run } from '@pr-checker/cli'
 run()

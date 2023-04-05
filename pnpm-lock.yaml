@@ -32,6 +32,9 @@ importers:
       '@pr-checker/build':
         specifier: workspace:*
         version: link:build
+      '@pr-checker/cli':
+        specifier: workspace:*
+        version: link:packages/cli
       '@pr-checker/extension':
         specifier: workspace:*
         version: link:packages/extension
@@ -138,7 +141,11 @@ importers:
         specifier: workspace:*
         version: link:../../utils
 
-  play: {}
+  play:
+    devDependencies:
+      '@pr-checker/cli':
+        specifier: workspace:*
+        version: link:../packages/cli
 
   utils: {}
 

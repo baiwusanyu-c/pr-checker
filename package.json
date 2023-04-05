@@ -62,6 +62,7 @@
   "devDependencies": {
     "@baiwusanyu/eslint-config": "^1.0.10",
     "@pr-checker/build": "workspace:*",
+    "@pr-checker/cli": "workspace:*",
     "@pr-checker/extension": "workspace:*",
     "@pr-checker/play": "workspace:*",
     "@pr-checker/utils": "workspace:*",

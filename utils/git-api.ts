@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/core'
+import { log } from '@pr-checker/utils'
 export declare interface IPRListItem {
   title: string
   number: number
@@ -57,9 +58,15 @@ export class GitApi {
           id: val.id,
         })
       })
+      if (!data.items || (data.items && data.items.length === 0))
+        log('error', 'You don\'t have any pull requests that are open')
+
       return res
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      if (error.status === 401)
+        log('error', 'Your token is invalid or does not match your username')
+
+      log('error', error)
       return []
     }
   }
@@ -107,9 +114,8 @@ export class GitApi {
         repo: repo_name,
         title: title || '',
       } as IPRInfo
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    } catch (error: any) {
+      log('error', error)
       return {}
     }
   }
@@ -135,15 +141,14 @@ export class GitApi {
         if (pr_info.sha !== cur_sha
           && pr_info.mergeable
           && !pr_info.merged)
-          return { isNeedUpdate: true }
+          return { isNeedUpdate: true, reason: '--' }
         else
           return { isNeedUpdate: false, reason: 'not updated' }
       } else {
         return { isNeedUpdate: false, reason: 'unknown error' }
       }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    } catch (error: any) {
+      log('error', error)
       return { isNeedUpdate: false, reason: 'unknown error' }
     }
   }
@@ -162,9 +167,8 @@ export class GitApi {
         },
       )
       return res.data.message
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    } catch (error: any) {
+      log('error', error)
       return {}
     }
   }
