@@ -3,7 +3,7 @@ export * from './git-api'
 
 export function createRunList(
   taskNum: number,
-  taskFunc: (index: number) => Promise<Record<any, any>>) {
+  taskFunc: (index: number) => Promise<Record<any, any> | void>) {
   const taskList = [] as Array<Promise<any>>
   for (let i = 0; i < taskNum; i++) {
     taskList.push(new Promise((resolve) => {

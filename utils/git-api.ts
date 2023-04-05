@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/core'
-import { log } from '@pr-checker/utils'
+import { createRunList, isEmptyObj, log } from '@pr-checker/utils'
 export declare interface IPRListItem {
   title: string
   number: number
@@ -36,15 +36,18 @@ export class GitApi {
   }
 
   /**
-   * 获取账户下所有 pr
+   * 获取账户下所有提交 pr
    * @param username
    */
-  async getPRList(username: string = this.owner) {
+  async getSubmitPRList(username: string = this.owner) {
     try {
       const { data } = await this.octokit.request('GET /search/issues', {
         q: `is:pr is:open author:${username}`,
         per_page: 1000,
       })
+      if (!data.items || (data.items && data.items.length === 0))
+        log('error', 'You don\'t have any pull requests that are open')
+
       const res = {} as Record<string, IPRListItem[]>
       data.items.forEach((val: any) => {
         const repo = val.repository_url.split('repos/')[1]
@@ -56,8 +59,47 @@ export class GitApi {
           id: val.id,
         })
       })
-      if (!data.items || (data.items && data.items.length === 0))
-        log('error', 'You don\'t have any pull requests that are open')
+      return res
+    } catch (error: any) {
+      if (error.status === 401)
+        log('error', 'Your token is invalid or does not match your username')
+
+      log('error', error)
+      return {}
+    }
+  }
+
+  async getAllRepoPRList(username: string = this.owner) {
+    try {
+      const { data } = await this.octokit.request('GET /user/repos', {
+        type: 'owner',
+        per_page: 1000,
+      })
+      const notForkRepoList = data.filter(v => !v.fork)
+      const res = {} as Record<string, IPRListItem[]>
+      await Promise.all(createRunList(notForkRepoList.length, async(i: number) => {
+        const { data: prData } = await this.octokit.request(
+          'GET /repos/{owner}/{repo}/pulls',
+          {
+            owner: username,
+            repo: notForkRepoList[i].name,
+            per_page: 1000,
+          })
+
+        prData.forEach((val: any) => {
+          const repo = notForkRepoList[i].full_name
+          if (!res[repo]) res[repo] = []
+          res[repo].push({
+            title: val.title,
+            number: val.number,
+            repo,
+            id: val.id,
+          })
+        })
+      }))
+
+      if (isEmptyObj(res))
+        log('error', 'You don\'t have any pull requests')
 
       return res
     } catch (error: any) {
@@ -65,7 +107,7 @@ export class GitApi {
         log('error', 'Your token is invalid or does not match your username')
 
       log('error', error)
-      return []
+      return {}
     }
   }
 
@@ -108,8 +150,9 @@ export class GitApi {
    * Determine whether pr wants to synchronize the upstream Repo
    * @param repo_name upstream Repo name
    * @param pr_info The getPRByRepo function returns the result
+   * @param mode
    */
-  async needUpdate(repo_name: string, pr_info: IPRInfo) {
+  async needUpdate(repo_name: string, pr_info: IPRInfo, mode: 'rebase' | 'merge') {
     try {
       if (pr_info.mergeable_state === 'dirty')
         return { isNeedUpdate: false, reason: 'code conflict' }
@@ -122,7 +165,8 @@ export class GitApi {
         // Comparison of the default branch hash of
         // the fork warehouse and the upstream warehouse hash
         const cur_sha = data[0].sha
-        if (pr_info.sha !== cur_sha
+        const matchedSha = (mode === 'rebase' && pr_info.sha !== cur_sha) || mode === 'merge'
+        if (matchedSha
           && pr_info.mergeable
           && !pr_info.merged)
           return { isNeedUpdate: true, reason: '--' }
@@ -142,13 +186,28 @@ export class GitApi {
    * @param pull_number
    * @param repo_name
    */
-  async updatePR(pull_number: number, repo_name: string) {
+  async rebasePR(pull_number: number, repo_name: string) {
     try {
       const res = await this.octokit.request(
         `PUT /repos/${repo_name}/pulls/{pull_number}/update-branch`,
         {
           pull_number,
         },
+      )
+      return res.data.message
+    } catch (error: any) {
+      log('error', error)
+      return {}
+    }
+  }
+
+  async mergePR(pull_number: number, repo_name: string) {
+    try {
+      const res = await this.octokit.request(
+          `PUT /repos/${repo_name}/pulls/{pull_number}/merge`,
+          {
+            pull_number,
+          },
       )
       return res.data.message
     } catch (error: any) {

@@ -8,14 +8,14 @@ import type { IPRCheckRes, IPRInfo, IPRListItem } from '@pr-checker/utils/git-ap
 import type { Storage } from '../store/storage'
 declare type IPRSelect = Record<string, IPRCheckRes[]>
 
-export async function handleSelect(store: Storage) {
+export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
   // select type ( all Repo ?)
   const isAllRepo = await promptsRun(typeOption)
 
   let updateRes = []
   const spinner = ora({ text: 'Loading Repo......', color: 'blue' }).start()
   const githubApi = new GitApi(store.token, store.username!)
-  const prList = await githubApi.getPRList()
+  const prList = mode === 'rebase' ? (await githubApi.getSubmitPRList()) : (await githubApi.getAllRepoPRList())
   spinner.stop()
   const repoList = Object.keys(prList)
 
@@ -26,12 +26,12 @@ export async function handleSelect(store: Storage) {
     const prl = prList[selectRepo.RepoSelect as keyof typeof prList] as IPRListItem[]
     // check pr
     log('info', `Checking PR by ${selectRepo.RepoSelect}......`)
-    const prListByRepo = await checkPR(prl, githubApi)
+    const prListByRepo = await checkPR(prl, githubApi, mode)
     // select pr
     const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
     // update pr
     log('info', `Update PR by ${selectRepo.RepoSelect}......`)
-    updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi)
+    updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi, mode)
   } else {
     const prl = [] as IPRListItem[]
     repoList.forEach((val: string) => {
@@ -41,12 +41,12 @@ export async function handleSelect(store: Storage) {
     })
     // check pr
     log('info', 'Checking PR......')
-    const prListByRepo = await checkPR(prl, githubApi)
+    const prListByRepo = await checkPR(prl, githubApi, mode)
     // select pr
     const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
     // update pr
     log('info', 'Update PR......')
-    updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi)
+    updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi, mode)
   }
 
   spinner.succeed()
@@ -54,7 +54,7 @@ export async function handleSelect(store: Storage) {
   await printUpdateRes(updateRes as IPRCheckRes[])
 }
 
-async function checkPR(prl: IPRListItem[], githubApi: GitApi) {
+async function checkPR(prl: IPRListItem[], githubApi: GitApi, mode: 'merge' | 'rebase') {
   if (prl.length === 0) {
     log('error', 'Please select a pr to check')
     process.exit()
@@ -63,7 +63,7 @@ async function checkPR(prl: IPRListItem[], githubApi: GitApi) {
     // get pr detail data
     const prInfo = await githubApi.getPRByRepo(prl[i].number, prl[i].repo, prl[i].title)
     // need update pr ?
-    const res = await githubApi.needUpdate(prl[i].repo, prInfo as IPRInfo)
+    const res = await githubApi.needUpdate(prl[i].repo, prInfo as IPRInfo, mode)
     log('success', `✔ Check PR #${prl[i].number} completed`)
     return {
       ...prInfo,
@@ -73,12 +73,19 @@ async function checkPR(prl: IPRListItem[], githubApi: GitApi) {
   return prListByRepo
 }
 
-async function updatePR(prl: IPRListItem[],
+async function updatePR(
+  prl: IPRListItem[],
   prSelectRes: IPRSelect,
-  githubApi: GitApi) {
+  githubApi: GitApi,
+  mode: 'merge' | 'rebase') {
   const updateRes = await Promise.all(createRunList(prl.length, async(i: number) => {
     if (prSelectRes.prSelect[i] && prSelectRes.prSelect[i].isNeedUpdate) {
-      await githubApi.updatePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+      if (mode === 'rebase')
+        await githubApi.rebasePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+
+      if (mode === 'merge')
+        await githubApi.mergePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+
       log('success', `✔ Update PR #${prl[i].number} completed`)
     }
     return {
