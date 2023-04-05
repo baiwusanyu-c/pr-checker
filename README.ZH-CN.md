@@ -138,6 +138,20 @@ pr-checker -v
 pr-checker -h
 ````
 
+#### -m ｜ --mode
+使用 rebase 模式 或者 merge 模式 , 默认值是 rebase 模式    
+
+> 在 `rebase` 模式中， 你可以选择仓库或这直接对所有你所提交的 `pr` 进行 `rebase` 操作  
+它将调用 `/repos/${repoName}/pulls/${prNumber}/update-branch`.  
+
+>在 `merge` 模式中，你可以对你所拥有的仓库（`fork` 的仓库除外）进行 `merge` 操作
+它将调用 `/repos/${repoName}/pulls/${prNumber}/merge`.
+一个典型的引用场景就是批量处理`dependabot`的 `pr` (加入到 `merge queue` 的功能还未完成)
+
+```` shell
+pr-checker run -m merge ｜ rebase
+````
+
 ## 快照
 <img src="./public/img1.png" alt="Detect and update your Pull Requests in batches"/>
 <img src="./public/img2.png" alt="Detect and update your Pull Requests in batches"/>
