@@ -26,21 +26,27 @@ async function initCli() {
   // get git config
   cli.option('-g, --get', 'get git config')
 
-  cli.command('run', 'check your pr').action(async() => {
-    if (!storage.token) {
-      log('error', 'use `pr-checker -t <TOKEN>` to set your token')
-      process.exit(1)
-    }
+  cli.command('run', 'check your pr')
+  // use rebase or merge
+    .option('-m <value>, --mode <value>', 'use rebase or merge')
+    .action(async(options) => {
+      if (!storage.token) {
+        log('error', 'use `pr-checker -t <TOKEN>` to set your token')
+        process.exit(1)
+      }
 
-    if (!storage.username) {
-      log('info', 'You have not set a username, '
+      if (!storage.username) {
+        log('info', 'You have not set a username, '
           + 'it has been automatically set for you according to the token')
-      const { login } = await getUserName(storage.token)
-      storage.username = login
-      await saveStorage()
-    }
-    await handleSelect(storage as Storage)
-  })
+        const { login } = await getUserName(storage.token)
+        storage.username = login
+        await saveStorage()
+      }
+
+      const { m, mode } = options
+      const lastMode = m || mode || 'rebase'
+      await handleSelect(storage as Storage, lastMode)
+    })
   cli.help()
   cli.version(version)
   return cli

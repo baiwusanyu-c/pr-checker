@@ -134,6 +134,20 @@ pr-checker -v
 #### -h ｜ --help
 Display help message
 
+#### -m ｜ --mode
+Use `rebase` mode or `merge` mode, the default value is `rebase` mode
+
+> In `rebase` mode, you can choose a repository or directly `rebase` all your submitted `pr`
+It will call `/repos/${repoName}/pulls/${prNumber}/update-branch`.
+
+>In `merge` mode, you can `merge` on repositories you own (except `fork` repositories)
+It will call `/repos/${repoName}/pulls/${prNumber}/merge`.
+A typical usage scenario is batch processing `pr` of `dependabot` (the function of adding to `merge queue` has not yet been completed)
+
+```` shell
+pr-checker run -m merge ｜ rebase
+````
+
 ```` shell
 pr-checker -h
 ````
