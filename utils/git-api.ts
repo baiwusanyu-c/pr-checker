@@ -28,13 +28,11 @@ export declare interface IPRCheckRes extends IPRInfo{
 export class GitApi {
   octokit: Octokit
   owner: string
-  forkRepoCache: Record<string, Record<'sha', string>>
   constructor(token: string, owner: string) {
     this.octokit = new Octokit({
       auth: token,
     })
     this.owner = owner
-    this.forkRepoCache = {}
   }
 
   /**
@@ -86,27 +84,13 @@ export class GitApi {
         },
       )
 
-      const forkRepoName = data.head.repo.full_name
-      const forkRepoDefaultBranch = data.head.repo.default_branch
-      if (!this.forkRepoCache[forkRepoName]) {
-        const { data: forkRepoData } = await this.octokit.request(
-          `GET /repos/${forkRepoName}/branches/{default_branch_name}`,
-          {
-            default_branch_name: forkRepoDefaultBranch,
-          },
-        )
-        this.forkRepoCache[forkRepoName] = {
-          sha: forkRepoData.commit.sha,
-        }
-      }
-
       return {
-        sha: this.forkRepoCache[forkRepoName].sha, // Fork warehouse default branch hash
+        sha: data.base.sha, // Fork warehouse default branch hash
         org_repo: data.base.repo.full_name,
         org_repo_default_branch: data.base.repo.default_branch,
         pr_sha: data.head.sha,
-        pr_repo: forkRepoName,
-        pr_repo_default_branch: forkRepoDefaultBranch,
+        pr_repo: data.head.repo.default_branch,
+        pr_repo_default_branch: data.head.repo.default_branch,
         merged: data.merged,
         mergeable: data.mergeable,
         mergeable_state: data.mergeable_state,
