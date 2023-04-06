@@ -81,7 +81,7 @@
     "@types/gulp": "^4.0.10",
     "@types/node": "^18.0.0",
     "@types/prompts": "^2.4.2",
-    "@vitest/coverage-c8": "^0.23.4",
+    "@vitest/coverage-c8": "^0.29.8",
     "@vitest/ui": "^0.23.4",
     "bumpp": "^8.2.1",
     "cross-env": "^7.0.3",
