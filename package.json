@@ -21,6 +21,14 @@
   "homepage": "https://github.com/baiwusanyu-c/pr-checker",
   "repository": "https://github.com/baiwusanyu-c/pr-checker",
   "bugs": "https://github.com/baiwusanyu-c/pr-checker/issues",
+  "main": "./cli/core/index.js",
+  "module": "./cli/core/index.js",
+  "exports": {
+    ".": {
+      "require": "./cli/core/index.cjs",
+      "import": "./cli/core/index.js"
+    }
+  },
   "files": [
     "cli",
     "README.ZH-CN.md",
