@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsup'
-import { CLI_ENTRY, EXT_ENTRY } from './contant'
+import { CLI_ENTRY } from './contant'
 import type { Options } from 'tsup'
 
 const baseConfig = {
@@ -21,6 +21,6 @@ function setConfig(entry: Record<string, string>) {
     configOptions.push(config)
   }
 }
-setConfig(EXT_ENTRY)
+// setConfig(EXT_ENTRY)
 setConfig(CLI_ENTRY)
 export default defineConfig(configOptions)

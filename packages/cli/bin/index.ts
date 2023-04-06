@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { run } from '../core'
+// @ts-expect-error
+import { run } from '@pr-checker/core'
 const start = async() => {
   try {
     await run()

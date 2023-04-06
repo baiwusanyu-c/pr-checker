@@ -1,5 +1,6 @@
 import { Octokit } from '@octokit/core'
-import { createRunList, isEmptyObj, log } from '@pr-checker/utils'
+import { log } from './log'
+import { createRunList, isEmptyObj } from './common'
 export declare interface IPRListItem {
   title: string
   number: number

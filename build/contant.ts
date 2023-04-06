@@ -9,7 +9,7 @@ export const CLI_DIR_MAP = {
   '@pr-checker/core': '../dist/cli/core/index[format]',
 }
 
-export const EXT_ENTRY = {
+/* export const EXT_ENTRY = {
   'extension/core': '../packages/extension/index.ts',
   'extension/utils': '../utils/index.ts',
-}
+} */
