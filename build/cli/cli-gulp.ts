@@ -5,9 +5,9 @@ import pkg from '../../package.json'
 import { parallelTask } from './rewirte-path'
 
 const distRoot = path.resolve(process.cwd(), '../../dist')
-const readmeDir = `${path.resolve('../../README.md')}`
+const readmeDir = path.resolve('../../README.md')
 const readmeOutputDir = `${distRoot}/README.md`
-const readmeCHDir = `${path.resolve('../../README.ZH-CN.md')}`
+const readmeCHDir = path.resolve('../../README.ZH-CN.md')
 const readmeCHOutputDir = `${distRoot}/README.ZH-CN.md`
 
 const movePkgToRootDist = async() => {
