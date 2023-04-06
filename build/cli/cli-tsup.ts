@@ -1,6 +1,8 @@
 import { defineConfig } from 'tsup'
-import { CLI_ENTRY } from './contant'
+import { CLI_ENTRY } from '../utils'
 import type { Options } from 'tsup'
+
+const outputDir = '../dist'
 
 const baseConfig = {
   entry: {},
@@ -17,10 +19,9 @@ function setConfig(entry: Record<string, string>) {
   for (const entryKey in entry) {
     const config = JSON.parse(JSON.stringify(baseConfig))
     config.entry = [entry[entryKey as keyof typeof entry]]
-    config.outDir = `../dist/${entryKey}`
+    config.outDir = `${outputDir}/${entryKey}`
     configOptions.push(config)
   }
 }
-// setConfig(EXT_ENTRY)
 setConfig(CLI_ENTRY)
 export default defineConfig(configOptions)

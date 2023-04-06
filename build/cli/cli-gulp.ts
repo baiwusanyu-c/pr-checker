@@ -1,10 +1,15 @@
 import path from 'path'
 import { series } from 'gulp'
 import fs from 'fs-extra'
-import pkg from '../package.json'
+import pkg from '../../package.json'
 import { parallelTask } from './rewirte-path'
 
-const distRoot = path.resolve(process.cwd(), '../dist')
+const distRoot = path.resolve(process.cwd(), '../../dist')
+const readmeDir = `${path.resolve('../../README.md')}`
+const readmeOutputDir = `${distRoot}/README.md`
+const readmeCHDir = `${path.resolve('../../README.ZH-CN.md')}`
+const readmeCHOutputDir = `${distRoot}/README.ZH-CN.md`
+
 const movePkgToRootDist = async() => {
   const content = JSON.parse(JSON.stringify(pkg))
   Reflect.deleteProperty(content, 'scripts')
@@ -20,8 +25,8 @@ const movePkgToRootDist = async() => {
 }
 
 const moveReadMeToRootDist = async() => {
-  await fs.copy(`${path.resolve('../README.md')}`, `${distRoot}/README.md`)
-  await fs.copy(`${path.resolve('../README.ZH-CN.md')}`, `${distRoot}/README-CN.md`)
+  await fs.copy(readmeDir, readmeOutputDir)
+  await fs.copy(readmeCHDir, readmeCHOutputDir)
 }
 
 export default series(

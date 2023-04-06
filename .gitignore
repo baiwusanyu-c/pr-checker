@@ -1,8 +1,8 @@
 # Project exclude paths
 /build/node_modules/
 /node_modules/
-/packages/entry/node_modules/
-/packages/cli/core/node_modules/
+/packages/extension/node_modules/
+/packages/cli/node_modules/
 /play/node_modules/
 /utils/node_modules/
 dist

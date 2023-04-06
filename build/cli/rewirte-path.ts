@@ -1,13 +1,13 @@
 import * as process from 'process'
 import * as path from 'path'
 import { dest, parallel, src } from 'gulp'
-import { relativeDir } from './utils'
-import { CLI_DIR_MAP } from './contant'
+import { CLI_DIR_MAP, relativeDir } from '../utils'
 
 const formatList = [
-  { runPath: path.resolve(process.cwd(), '../dist/**/*.js'), format: '.js' },
-  { runPath: path.resolve(process.cwd(), '../dist/**/*.cjs'), format: '.cjs' },
+  { runPath: path.resolve(process.cwd(), '../../dist/**/*.js'), format: '.js' },
+  { runPath: path.resolve(process.cwd(), '../../dist/**/*.cjs'), format: '.cjs' },
 ]
+const outputDir = '../../dist'
 
 export const parallelTask = () => {
   const parallelTaskList: any[] = []
@@ -34,7 +34,7 @@ export const parallelTask = () => {
           }
           fileData.contents = Buffer.from(content)
         })
-        .pipe(dest('../dist'))
+        .pipe(dest(outputDir))
     }))
   })
 

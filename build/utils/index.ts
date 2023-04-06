@@ -1,6 +1,7 @@
 import { spawn } from 'child_process'
 import path from 'path'
 
+export * from './contant'
 export function relativeDir(relative: string, absolute: string) {
   const rela = relative.split('/')
   rela.shift()
