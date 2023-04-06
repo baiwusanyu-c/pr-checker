@@ -1,7 +1,7 @@
 import * as process from 'process'
-import { log } from '@pr-checker/utils'
+import { getUserName, log } from '@pr-checker/utils'
 import { cac } from 'cac'
-import { getUserName } from '@pr-checker/utils/git-api'
+
 import { version } from '../../../package.json'
 import { loadStorage, saveStorage } from './store/storage'
 import { handleSelect } from './select/handle-select'

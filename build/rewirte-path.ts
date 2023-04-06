@@ -5,8 +5,8 @@ import { relativeDir } from './utils'
 import { CLI_DIR_MAP } from './contant'
 
 const formatList = [
-  { runPath: path.resolve(process.cwd(), 'dist/**/*.js'), format: '.js' },
-  { runPath: path.resolve(process.cwd(), 'dist/**/*.cjs'), format: '.cjs' },
+  { runPath: path.resolve(process.cwd(), '../dist/**/*.js'), format: '.js' },
+  { runPath: path.resolve(process.cwd(), '../dist/**/*.cjs'), format: '.cjs' },
 ]
 
 export const parallelTask = () => {
@@ -34,7 +34,7 @@ export const parallelTask = () => {
           }
           fileData.contents = Buffer.from(content)
         })
-        .pipe(dest('dist'))
+        .pipe(dest('../dist'))
     }))
   })
 

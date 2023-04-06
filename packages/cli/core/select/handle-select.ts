@@ -4,7 +4,7 @@ import { GitApi, createRunList, isEmptyObj, log } from '@pr-checker/utils'
 import { Table } from 'console-table-printer'
 import chalk from 'chalk'
 import { createPrOption, createRepoOption, promptsRun, typeOption } from './select-configure'
-import type { IPRCheckRes, IPRInfo, IPRListItem } from '@pr-checker/utils/git-api'
+import type { IPRCheckRes, IPRInfo, IPRListItem } from '@pr-checker/utils'
 import type { Storage } from '../store/storage'
 declare type IPRSelect = Record<string, IPRCheckRes[]>
 

@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import { formatEllipsis, log } from '@pr-checker/utils'
 import prompts from 'prompts'
-import type { IPRCheckRes } from '@pr-checker/utils/git-api'
+import type { IPRCheckRes } from '@pr-checker/utils'
 import type * as promptsType from 'prompts'
 export const typeOption = [{
   type: 'select',
