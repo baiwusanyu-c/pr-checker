@@ -83,7 +83,7 @@
     "@types/prompts": "^2.4.2",
     "@vitest/coverage-c8": "^0.29.8",
     "@vitest/ui": "^0.23.4",
-    "bumpp": "^8.2.1",
+    "bumpp": "^9.1.0",
     "cross-env": "^7.0.3",
     "eslint": "8.32.0",
     "esno": "^0.16.3",
