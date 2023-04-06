@@ -7,7 +7,7 @@
   "license": "ISC",
   "author": "",
   "scripts": {
-    "build": "cross-env tsup-node --config tsup-build.ts && pnpm run rewrite",
+    "build": "tsup-node --config tsup-build.ts && pnpm run rewrite",
     "rewrite": "gulp -require sucrase/register/ts -f gulp-file.ts",
     "clean": "rimraf dist"
   },

@@ -7,6 +7,7 @@ const baseConfig = {
   external: ['ora', 'chalk', 'fs-extra'],
   format: ['cjs', 'esm'],
   clean: true,
+  minify: true,
   outDir: '',
 
 }
