@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import pkg from '../../package.json'
 
-const outputDir = '../../dist/extension/manifest.jsont'
+const outputDir = '../../dist/extension/manifest.json'
 function getManifest() {
   return {
     manifest_version: 3,
@@ -10,8 +10,8 @@ function getManifest() {
     description: pkg.description,
     action: {
       default_icon: {
-        19: './ui/assets/favicon_16.png',
-        38: './ui/assets/favicon_32.png',
+        19: './ui/favicon_16.png',
+        38: './ui/favicon_32.png',
       },
       default_popup: './ui/chrome-popup/popup.html',
     },
@@ -22,6 +22,7 @@ function getManifest() {
     background: {
       service_worker: './chrome-background/index.js',
     },
+    content_scripts: [],
     commands: {
       _execute_action: {
         suggested_key: {
@@ -39,12 +40,11 @@ function getManifest() {
       'activeTab',
     ],
     homepage_url: pkg.homepage,
-    default_locale: 'en',
     icons: {
-      16: './ui/assets/favicon_16.png',
-      32: './ui/assets/favicon_32.png',
-      64: './ui/assets/favicon_64.png',
-      128: './ui/assets/favicon_128.png',
+      16: './ui/favicon_16.png',
+      32: './ui/favicon_32.png',
+      64: './ui/favicon_64.png',
+      128: './ui/favicon_128.png',
     },
   }
 }
@@ -54,3 +54,4 @@ export async function writeManifest() {
 }
 
 // TODO: ext dev
+// TODO: rewrite path

@@ -8,7 +8,7 @@
   "author": "",
   "main": "index.ts",
   "scripts": {
-    "ext:dev": "vite serve --host",
+    "ext:dev": "vite build --watch",
     "ext:build": "vite build"
   },
   "dependencies": {
