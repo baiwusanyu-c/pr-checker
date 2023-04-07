@@ -10,13 +10,13 @@ function getManifest() {
     description: pkg.description,
     action: {
       default_icon: {
-        19: './ui/favicon_16.png',
-        38: './ui/favicon_32.png',
+        19: './favicon_16.png',
+        38: './favicon_32.png',
       },
-      default_popup: './ui/chrome-popup/popup.html',
+      default_popup: './chrome-popup/popup.html',
     },
     options_ui: {
-      page: './ui/chrome-option/option.html',
+      page: './chrome-option/option.html',
       open_in_tab: true,
     },
     background: {
@@ -41,10 +41,10 @@ function getManifest() {
     ],
     homepage_url: pkg.homepage,
     icons: {
-      16: './ui/favicon_16.png',
-      32: './ui/favicon_32.png',
-      64: './ui/favicon_64.png',
-      128: './ui/favicon_128.png',
+      16: './favicon_16.png',
+      32: './favicon_32.png',
+      64: './favicon_64.png',
+      128: './favicon_128.png',
     },
   }
 }

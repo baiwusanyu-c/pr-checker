@@ -10,7 +10,7 @@
     "build": "pnpm run build:cli && pnpm run build:ext",
     "build:cli": "tsup-node --config cli/cli-tsup.ts && pnpm run rewrite",
     "build:ext": "pnpm run --filter @pr-checker/extension ext:build && pnpm run build:ext:bg:manifest",
-    "build:ext:bg:manifest": "pnpm run manifest && tsup-node --config ext/ext-tsup.ts",
+    "build:ext:bg:manifest": "tsup-node --config ext/ext-tsup.ts && pnpm run manifest",
     "manifest": "gulp -require sucrase/register/ts -f ext/ext-gulp.ts",
     "rewrite": "gulp -require sucrase/register/ts -f cli/cli-gulp.ts",
     "clean": "rimraf dist"

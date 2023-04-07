@@ -1,24 +1,15 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import viteCompression from 'vite-plugin-compression'
-import { viteImgCompress } from 'unplugin-img-compress'
 import UnoCSS from 'unocss/vite'
 
 export default defineConfig({
   plugins: [
     react(),
     UnoCSS(),
-    viteCompression(),
-    viteImgCompress({
-      APIKey: 'kZgn8pxfdjQjKFmf2StLq7CY4TqMgs0T',
-      dir: '',
-      runtime: 'build',
-      mode: 'once',
-    }),
   ],
   build: {
-    outDir: '../../dist/extension/ui',
+    outDir: '../../dist/extension',
     minify: false,
     cssCodeSplit: true,
     commonjsOptions: {

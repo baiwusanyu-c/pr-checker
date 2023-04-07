@@ -4,7 +4,6 @@ import {
   presetIcons,
   presetTypography,
   presetUno,
-  presetWebFonts,
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss'
@@ -12,7 +11,7 @@ import {
 export default defineConfig({
   theme: {
     colors: {
-      lightBlue: '#00ffff',
+      main: '#1cd2a9',
     },
   },
   presets: [
@@ -28,14 +27,6 @@ export default defineConfig({
       },
     }),
     presetTypography(),
-    presetWebFonts({
-      provider: 'google', // default provider
-      fonts: {
-        sans: 'Open Sans',
-        serif: 'Montserrat',
-        mono: ['Fira Code', 'Fira Mono:400,700'],
-      },
-    }),
   ],
   transformers: [
     transformerDirectives(),
