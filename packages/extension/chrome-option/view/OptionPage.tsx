@@ -13,7 +13,6 @@ const headerStyle: React.CSSProperties = {
 }
 
 const contentStyle: React.CSSProperties = {
-
   height: 'calc(100vh - 64px)',
   color: '#ffffff',
 }

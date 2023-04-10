@@ -1,74 +1,101 @@
 import { Button, Input, Spin, Tooltip } from 'antd'
 import { getRebaseRepo } from '@pr-checker/fetchGit'
-import { useEffect, useState } from 'react'
-
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useThrottleFn } from 'ahooks'
+// TODO: merge data
+// TODO: logo data
 interface IRepoListProps {
   opType: string
   token: string
   userName: string
 }
-// TODO: merge data
-// TODO: logo data
+
+interface IRepo {
+  name: string
+  url: string
+}
+
+interface IRepoWithPRs extends IRepo {
+  pullRequests: Record<any, any>[]
+}
+
 export const RepoList = (props: IRepoListProps) => {
-  const [repoListEl, setrepoListEl] = useState([])
+  const [repoList, setRepoList] = useState<IRepoWithPRs[]>([])
+  const repoListCache = useRef<IRepoWithPRs[]>([])
   const [loading, setLoading] = useState(false)
   useEffect(() => {
     if (props.opType === 'rebase') {
-      const getReq = async() => {
-        const res = await getRebaseRepo(props.token, props.userName)
-        setRepoListData(res.items)
-        setrepoListEl(setRepoListRender())
-        setLoading(false)
-      }
       setLoading(true)
-      getReq()
+      getRebaseRepo(props.token, props.userName)
+        .then((res) => {
+          // 使用 map 避免重复遍历
+          const repos = new Map<string, IRepoWithPRs>()
+          res.items.forEach((val) => {
+            const repoName = val.repository_url.split('/').pop()!
+            const repoUName = val.repository_url.split('repos/').pop()!
+            const repoURL = val.repository_url
+            if (!repos.has(repoURL)) {
+              // 如果 repoURL 不存在，就新建一个 IRepoWithPRs 对象
+              repos.set(repoURL, { name: repoName, url: repoURL, uname: repoUName, pullRequests: [val] })
+            } else {
+              // 如果 repoURL 存在，就把当前 PR 加入到该 Repo 的 pullRequests 数组里
+              const repo = repos.get(repoURL)!
+              repo.pullRequests.push(val)
+            }
+          })
+          // 将 map 转成数组，并设置到 state 里
+          const resRepo = [...repos.values()]
+          setRepoList(resRepo)
+          repoListCache.current = resRepo
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     }
-  }, [props.opType, props.token, props.userName, setRepoListData, setRepoListRender])
+  }, [props.opType, props.token, props.userName])
 
-  const repoNameSet: Set<string> = new Set()
-  const repoListSet: Set<string> = new Set()
-  const repoToPrMap = new Map<string, Array<Record<any, any>>>()
-  function setRepoListData(list: Array<Record<any, any>>) {
-    list.forEach((val) => {
-      const repoName = val.repository_url.split('/').pop()
-      const repos = val.repository_url.split('repos/').pop()
-      repoListSet.add(repos)
-      repoNameSet.add(repoName)
-      let prL = []
-      if (repoToPrMap.get(repos))
-        prL = repoToPrMap.get(repos)
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const handleClick = useCallback((index: number) => {
+    setActiveIndex(index)
+    const repo = repoList[index]
+    console.log(repo.url)
+    console.log(repo.name)
+  }, [repoList])
 
-      prL.push(val)
-      repoToPrMap.set(repos, prL)
-    })
-  }
-
-  const handleClick = (index) => {
-    setrepoListEl(setRepoListRender(index))
-    console.log([...repoListSet][index])
-    console.log([...repoNameSet][index])
-  }
-
-  function setRepoListRender(activeIndex = -1) {
-    const repo = [...repoListSet]
-    return [...repoNameSet].map((value, index) => {
-      return (
-        <Tooltip title={repo[index]} key={value}>
+  const repoListEl = useMemo(() => {
+    return repoList.map((repo, index) => (
+        <Tooltip title={repo.uname} key={repo.url}>
           <li
-            style={activeIndex === index ? { backgroundColor: '#cafcec', color: '#1cd2a9' } : {}}
-            className="flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main cursor-pointer"
-            onClick={() => handleClick(index)}
+              style={activeIndex === index ? { backgroundColor: '#cafcec', color: '#1cd2a9' } : {}}
+              className="flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main cursor-pointer"
+              onClick={() => handleClick(index)}
           >
             {/* <Avatar size={20} className="mr-2" shape="square">{value[0]}</Avatar> */}
-            <span style={{ fontSize: '14px' }} className="text-bold" title={repo[index]}> {value}</span>
+            <span style={{ fontSize: '14px' }} className="text-bold">
+            {repo.name}
+            </span>
           </li>
         </Tooltip>
-      )
+    ))
+  }, [repoList, handleClick, activeIndex])
+
+  const handleSearch = (e) => {
+    const searchParams = e.target.value
+    const filterRes = repoListCache.current.filter((item) => {
+      return item.name.toLowerCase().includes(searchParams.toLowerCase())
     })
+    setRepoList(filterRes)
   }
+
+  const { run } = useThrottleFn(
+    (e) => {
+      handleSearch(e)
+    },
+    { wait: 300 },
+  )
   return (
     <div id="pr_checker_repo_list">
-      <Input placeholder="Input repo name" className="mb-4" />
+      <Input placeholder="Input repo name" className="mb-4" onChange={run} />
       <Button type="primary" className="mb-4 w-full" >
         { `${props.opType} all`}
       </Button>
