@@ -4,20 +4,22 @@ import { useCallback, useEffect, useState } from 'react'
 import { getUserInfo } from '@pr-checker/fetchGit'
 import { GithubOutlined, UserOutlined } from '@ant-design/icons'
 import { useStorage } from '../../hooks/use-storage'
-// TODO: logo
+
 const loginBg = new URL('../../assets/img/login-bg.png', import.meta.url).href
+const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 export const PopupPage = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [opType, setOpType] = useState('')
   const { setItem, CACHE_KEYS, getItem } = useStorage()
 
-  const onFinish = async(values) => {
-    // 存储操作类型
-    await setItem(CACHE_KEYS.OP_TYPE, opType)
-    // 存储TOKEN
-    await setItem(CACHE_KEYS.TOKEN, values.token)
+  const onFinish = useCallback(async(values) => {
+    // 存储操作类型和 TOKEN
+    await Promise.all([
+      setItem(CACHE_KEYS.OP_TYPE, opType),
+      setItem(CACHE_KEYS.TOKEN, values.token),
+    ])
     chrome.runtime.openOptionsPage()
-  }
+  }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, opType, setItem])
 
   const [loading, setLoading] = useState(false)
   const [showInput, setShowInput] = useState(true)
@@ -27,44 +29,53 @@ export const PopupPage = () => {
     login: '',
     name: '',
   })
-  const isShow = useCallback(() => {
-    const run = async() => {
-      // 有 TOKEN, 则显示头像
-      const token = await getItem(CACHE_KEYS.TOKEN)
-      if (token)
-        setShowInput(false)
-      else
-        setShowInput(true)
 
-      setLoading(true)
-      const res = await getUserInfo(token as string)
-      setUserInfo({
-        html_url: res.html_url,
-        avatar_url: res.avatar_url,
-        login: res.login,
-        name: res.name,
-      })
-      await setItem(CACHE_KEYS.USER_INFO, JSON.stringify(res))
-      setLoading(false)
-    }
-    run()
-  }, [CACHE_KEYS.USER_INFO, CACHE_KEYS.TOKEN, setItem, getItem])
+  const getToken = useCallback(async() => {
+    const token = await getItem(CACHE_KEYS.TOKEN)
+    if (token)
+      setShowInput(false)
+    else
+      setShowInput(true)
+
+    return token
+  }, [])
+
+  const getUserData = useCallback(async(token: string) => {
+    setLoading(true)
+    const res = await getUserInfo(token)
+    setUserInfo({
+      html_url: res.html_url,
+      avatar_url: res.avatar_url,
+      login: res.login,
+      name: res.name,
+    })
+    await setItem(CACHE_KEYS.USER_INFO, JSON.stringify(res))
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    isShow()
-  }, [isShow])
+    const fetchData = async() => {
+      const token = await getToken()
+      if (typeof token === 'string')
+        await getUserData(token)
+    }
+    fetchData()
+  }, [getToken, getUserData])
 
-  const goOption = async(opType: string) => {
+  const goOption = useCallback(async(opType: string) => {
     // 存储操作类型
     await setItem(CACHE_KEYS.OP_TYPE, opType)
     chrome.runtime.openOptionsPage()
-  }
+  }, [CACHE_KEYS.OP_TYPE, setItem])
   return (
         <div className="h-240px w-380px p-4 login" style={{ backgroundImage: `url(${loginBg})` }}>
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-gray-600 leading-1 m-0">
-              pr-checker
-            </h1>
+            <div className="flex items-center">
+              <img src={logoImg} alt="pr-checker" className="w-30px h-30px mr-2" />
+              <h1 className="text-gray-600 leading-1 m-0">
+                pr-checker
+              </h1>
+            </div>
             <a
               href="https://github.com/baiwusanyu-c/pr-checker"
               target="_blank" rel="noreferrer"

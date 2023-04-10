@@ -67,7 +67,7 @@ export const RepoList = (props: IRepoListProps) => {
         <Tooltip title={repo.uname} key={repo.url}>
           <li
               style={activeIndex === index ? { backgroundColor: '#cafcec', color: '#1cd2a9' } : {}}
-              className="flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main cursor-pointer"
+              className="cursor-pointer flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main"
               onClick={() => handleClick(index)}
           >
             {/* <Avatar size={20} className="mr-2" shape="square">{value[0]}</Avatar> */}
@@ -95,7 +95,7 @@ export const RepoList = (props: IRepoListProps) => {
   )
   return (
     <div id="pr_checker_repo_list">
-      <Input placeholder="Input repo name" className="mb-4" onChange={run} />
+      <Input placeholder="Input repo name" className="mb-4" onChange={run} allowClear />
       <Button type="primary" className="mb-4 w-full" >
         { `${props.opType} all`}
       </Button>

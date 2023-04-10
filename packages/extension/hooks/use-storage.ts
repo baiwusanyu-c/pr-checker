@@ -2,7 +2,7 @@
 export enum CACHE_KEYS {
   TOKEN = 'TOKEN',
   OP_TYPE = 'OP_TYPE',
-  USER_INFO = 'user_info',
+  USER_INFO = 'USER_INFO',
 }
 
 const cache = {} as Record<string, unknown>
