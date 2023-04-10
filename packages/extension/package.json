@@ -8,11 +8,13 @@
   "author": "",
   "main": "index.ts",
   "scripts": {
+    "dev": "vite serve",
     "ext:dev": "vite build --watch",
     "ext:build": "vite build"
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
+    "@pr-checker/fetchGit": "workspace:*",
     "@pr-checker/utils": "workspace:*",
     "@types/prop-types": "^15.7.5",
     "antd": "^5.4.0",

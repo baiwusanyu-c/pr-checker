@@ -102,6 +102,7 @@ importers:
   packages/extension:
     specifiers:
       '@ant-design/icons': ^5.0.1
+      '@pr-checker/fetchGit': workspace:*
       '@pr-checker/utils': workspace:*
       '@reduxjs/toolkit': ^1.9.3
       '@types/prop-types': ^15.7.5
@@ -113,19 +114,18 @@ importers:
       react: ^18.2.0
       react-dom: ^18.2.0
       react-redux: ^8.0.5
-      react-router-dom: ^6.10.0
       unocss: ^0.50.6
       unplugin-img-compress: ^1.1.0
       vite: ^4.2.1
       vite-plugin-compression: ^0.5.1
     dependencies:
       '@ant-design/icons': 5.0.1_biqbaboplfbrettd7655fr4n2y
+      '@pr-checker/fetchGit': link:../fetch-git
       '@pr-checker/utils': link:../../utils
       '@types/prop-types': 15.7.5
       antd: 5.4.0_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
-      react-router-dom: 6.10.0_biqbaboplfbrettd7655fr4n2y
     devDependencies:
       '@reduxjs/toolkit': 1.9.3_k4ae6lp43ej6mezo3ztvx6pykq
       '@types/react': 18.0.33
@@ -137,6 +137,15 @@ importers:
       unplugin-img-compress: 1.1.0
       vite: 4.2.1
       vite-plugin-compression: 0.5.1_vite@4.2.1
+
+  packages/fetch-git:
+    specifiers:
+      '@pr-checker/utils': workspace:*
+      qs: ^6.11.1
+    dependencies:
+      '@pr-checker/utils': link:../../utils
+    devDependencies:
+      qs: 6.11.1
 
   play:
     specifiers:
@@ -1072,11 +1081,6 @@ packages:
       redux-thunk: 2.4.2_redux@4.2.1
       reselect: 4.1.7
     dev: true
-
-  /@remix-run/router/1.5.0:
-    resolution: {integrity: sha512-bkUDCp8o1MvFO+qxkODcbhSqRa6P2GXgrGZVpt0dCXNW2HCSCqYI0ZoAqEOSAjRWmmlKcYgFvN4B4S+zo/f8kg==}
-    engines: {node: '>=14'}
-    dev: false
 
   /@rollup/plugin-node-resolve/15.0.2_rollup@3.20.2:
     resolution: {integrity: sha512-Y35fRGUjC3FaurG722uhUuG8YHOJRJQbI6/CkbRkdPotSpDj9NtIN85z1zrcyDcCQIW4qp5mgG72U+gJ0TAFEg==}
@@ -6417,6 +6421,13 @@ packages:
       react: 18.2.0
     dev: false
 
+  /qs/6.11.1:
+    resolution: {integrity: sha512-0wsrzgTz/kAVIeuxSjnpGC56rzYtr6JT/2BwEvMaPhFIoYa1aGO8LbzuU1R0uUYQkLpWBTOj0l/CLAJB64J6nQ==}
+    engines: {node: '>=0.6'}
+    dependencies:
+      side-channel: 1.0.4
+    dev: true
+
   /querystringify/2.2.0:
     resolution: {integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==}
     dev: true
@@ -7028,29 +7039,6 @@ packages:
     resolution: {integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==}
     engines: {node: '>=0.10.0'}
     dev: true
-
-  /react-router-dom/6.10.0_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-E5dfxRPuXKJqzwSe/qGcqdwa18QiWC6f3H3cWXM24qj4N0/beCIf/CWTipop2xm7mR0RCS99NnaqPNjHtrAzCg==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
-    dependencies:
-      '@remix-run/router': 1.5.0
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      react-router: 6.10.0_react@18.2.0
-    dev: false
-
-  /react-router/6.10.0_react@18.2.0:
-    resolution: {integrity: sha512-Nrg0BWpQqrC3ZFFkyewrflCud9dio9ME3ojHCF/WLsprJVzkq3q3UeEhMCAW1dobjeGbWgjNn/PVF6m46ANxXQ==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      react: '>=16.8'
-    dependencies:
-      '@remix-run/router': 1.5.0
-      react: 18.2.0
-    dev: false
 
   /react/18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
