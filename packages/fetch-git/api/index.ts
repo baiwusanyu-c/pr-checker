@@ -9,3 +9,15 @@ export async function getUserInfo(token: string) {
   })
   return res
 }
+
+export async function getRebaseRepo(token: string, username: string) {
+  const res = await request(`${baseUrl}/search/issues`, {
+    method: 'GET',
+    token,
+    params: {
+      q: `is:pr is:open author:${username}`,
+      per_page: 1000,
+    },
+  })
+  return res
+}

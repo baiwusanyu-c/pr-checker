@@ -2,6 +2,7 @@
 export enum CACHE_KEYS {
   TOKEN = 'TOKEN',
   OP_TYPE = 'OP_TYPE',
+  USER_INFO = 'user_info',
 }
 
 const cache = {} as Record<string, unknown>
@@ -54,7 +55,7 @@ export function useStorage() {
   }
 }
 
-function getAllStorageSyncData() {
+export async function getAllStorageSyncData() {
   // Immediately return a promise and start asynchronous work
   return new Promise((resolve, reject) => {
     // Asynchronously fetch all data from storage.sync.

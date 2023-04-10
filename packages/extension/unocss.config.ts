@@ -12,6 +12,7 @@ export default defineConfig({
   theme: {
     colors: {
       main: '#1cd2a9',
+      mLight: '#cafcec',
     },
   },
   presets: [

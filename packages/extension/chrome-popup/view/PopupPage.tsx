@@ -1,6 +1,6 @@
 import '../../assets/styles/login.css'
 import { Avatar, Button, Form, Input, Spin } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getUserInfo } from '@pr-checker/fetchGit'
 import { GithubOutlined, UserOutlined } from '@ant-design/icons'
 import { useStorage } from '../../hooks/use-storage'
@@ -27,28 +27,32 @@ export const PopupPage = () => {
     login: '',
     name: '',
   })
-  const isShow = async() => {
-    // 有 TOKEN, 则显示头像
-    const token = await getItem(CACHE_KEYS.TOKEN)
-    if (token)
-      setShowInput(false)
-    else
-      setShowInput(true)
+  const isShow = useCallback(() => {
+    const run = async() => {
+      // 有 TOKEN, 则显示头像
+      const token = await getItem(CACHE_KEYS.TOKEN)
+      if (token)
+        setShowInput(false)
+      else
+        setShowInput(true)
 
-    setLoading(true)
-    const res = await getUserInfo(token as string)
-    setUserInfo({
-      html_url: res.html_url,
-      avatar_url: res.avatar_url,
-      login: res.login,
-      name: res.name,
-    })
-    setLoading(false)
-  }
+      setLoading(true)
+      const res = await getUserInfo(token as string)
+      setUserInfo({
+        html_url: res.html_url,
+        avatar_url: res.avatar_url,
+        login: res.login,
+        name: res.name,
+      })
+      await setItem(CACHE_KEYS.USER_INFO, JSON.stringify(res))
+      setLoading(false)
+    }
+    run()
+  }, [CACHE_KEYS.USER_INFO, CACHE_KEYS.TOKEN, setItem, getItem])
 
   useEffect(() => {
     isShow()
-  }, [])
+  }, [isShow])
 
   const goOption = async(opType: string) => {
     // 存储操作类型
