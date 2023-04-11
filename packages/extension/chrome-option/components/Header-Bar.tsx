@@ -2,8 +2,8 @@ import { GithubOutlined, UserOutlined } from '@ant-design/icons'
 import { Avatar } from 'antd'
 import { useEffect, useState } from 'react'
 import { useMount } from 'ahooks'
-import { CarbonSun } from './icon-sun'
-import { CarbonMoon } from './icon-moon'
+import { CarbonSun } from './Icon-Sun'
+import { CarbonMoon } from './Icon-Moon'
 import type { IRepoWithPRs } from './Repo-List'
 interface HeaderBarProps {
   userInfo: {
