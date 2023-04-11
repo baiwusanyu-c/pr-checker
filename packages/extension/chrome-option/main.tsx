@@ -5,7 +5,7 @@ import store from '../store'
 import { OptionPage } from './view/OptionPage'
 import 'antd/dist/reset.css'
 import 'uno.css'
-
+import { App } from 'antd';
 ReactDOM.createRoot(document.getElementById('app') as HTMLElement).render(
   <ConfigProvider
     theme={{
@@ -14,8 +14,10 @@ ReactDOM.createRoot(document.getElementById('app') as HTMLElement).render(
       },
     }}
   >
-     <Provider store={store}>
-         <OptionPage />
-     </Provider>
+    <App>
+      <Provider store={store}>
+          <OptionPage />
+      </Provider>
+    </App>
   </ConfigProvider>,
 )

@@ -1,5 +1,5 @@
 import { useThrottleFn } from 'ahooks'
-import { Button, Input, Modal, Space, Table, Tag, Tooltip, message } from 'antd'
+import { App, Button, Input, Space, Table, Tag, Tooltip } from 'antd'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import { useEffect, useRef, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
@@ -7,7 +7,6 @@ import { compareBranch, getPRDetail, rebasePr } from '@pr-checker/fetchGit'
 import type React from 'react'
 import type { IRepoWithPRs } from './Repo-List'
 import type { ColumnsType } from 'antd/es/table'
-
 interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs
@@ -28,9 +27,8 @@ interface DataType {
 // TODO merge
 // TODO merge all select handle
 
-// TODO rebase all select handle
-
 // TODO refactor
+// TODO: rerender fail ?
 export const PrList = (props: PrListProps) => {
   const [tableData, settableData] = useState<DataType[] >([])
   const tableDataCache = useRef<DataType[]>([])
@@ -38,9 +36,8 @@ export const PrList = (props: PrListProps) => {
   useEffect(() => {
     if (props.repoInfo.pullRequests.length > 0) {
       setLoading(true)
-      if(props.opType === 'rebase'){
+      if (props.opType === 'rebase')
         handleTableData(props.repoInfo.pullRequests)
-      }
     }
   }, [props.repoInfo, props.opType])
 
@@ -101,8 +98,8 @@ export const PrList = (props: PrListProps) => {
     { wait: 300 },
   )
 
-  const { confirm } = Modal
-  const [messageApi, contextHolder] = message.useMessage()
+  const { modal, message } = App.useApp()
+  const { confirm } = modal
   const handleOp = async(item: DataType) => {
     confirm({
       title: 'Tips',
@@ -117,9 +114,11 @@ export const PrList = (props: PrListProps) => {
         return new Promise((resolve) => {
           const run = async() => {
             if (props.opType === 'rebase') {
-              const res = await rebasePrList(props.token, item.repoName, [item.number])
-              resolve(res)
+              window.alert('a')
+              //await rebasePrList(props.token, item.repoName, [item.number])
+              setLoading(true)
               handleTableData(props.repoInfo.pullRequests)
+              resolve(true)
             }
           }
           run()
@@ -133,7 +132,7 @@ export const PrList = (props: PrListProps) => {
       await Promise.all(createRunList(numberArr.length, async(i: number) => {
         await rebasePr(token, repoName, numberArr[i])
       }))
-      messageApi.open({
+      message.open({
         type: 'success',
         content: 'rebase success',
       })
@@ -153,7 +152,7 @@ export const PrList = (props: PrListProps) => {
 
   const handleOpAll = async() => {
     if (selectedNumberData.length === 0) {
-      messageApi.open({
+      message.open({
         type: 'warning',
         content: 'Select the row you want to work on',
       })
@@ -171,10 +170,10 @@ export const PrList = (props: PrListProps) => {
           return new Promise((resolve) => {
             const run = async() => {
               if (props.opType === 'rebase') {
-                const res = await rebasePrList(props.token, props.repoInfo.uname, selectedNumberData)
-                resolve(res)
+                //await rebasePrList(props.token, props.repoInfo.uname, selectedNumberData)
                 setLoading(true)
                 handleTableData(props.repoInfo.pullRequests)
+                resolve(true)
               }
             }
             run()
@@ -285,7 +284,6 @@ export const PrList = (props: PrListProps) => {
              scroll={{ y: 'calc(100vh - 200px)' }}
              pagination={false}
       />
-      {contextHolder}
     </div>
   )
 }
