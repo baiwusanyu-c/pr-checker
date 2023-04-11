@@ -7,14 +7,16 @@ interface IRepoListProps {
   opType: string
   token: string
   userName: string
+  onSelect: (data: IRepoWithPRs) => void
 }
 
 interface IRepo {
   name: string
+  uname: string
   url: string
 }
 
-interface IRepoWithPRs extends IRepo {
+export interface IRepoWithPRs extends IRepo {
   pullRequests: Record<any, any>[]
 }
 
@@ -22,10 +24,11 @@ export const RepoList = (props: IRepoListProps) => {
   const [repoList, setRepoList] = useState<IRepoWithPRs[]>([])
   const repoListCache = useRef<IRepoWithPRs[]>([])
   const [loading, setLoading] = useState(false)
+  const { token, opType, userName, onSelect } = props
   useEffect(() => {
     setLoading(true)
-    if (props.opType === 'rebase') {
-      getIssuesPR(props.token, props.userName)
+    if (opType === 'rebase') {
+      getIssuesPR(token, userName)
         .then((res) => {
           // 使用 map 避免重复遍历
           const repos = new Map<string, IRepoWithPRs>()
@@ -46,14 +49,15 @@ export const RepoList = (props: IRepoListProps) => {
           const resRepo = [...repos.values()]
           setRepoList(resRepo)
           repoListCache.current = resRepo
+          onSelect(resRepo[0])
         })
         .finally(() => {
           setLoading(false)
         })
     }
     // merge 模式 我们只获取仓库信息
-    if (props.opType === 'merge') {
-      getAllRepo(props.token).then((res) => {
+    if (opType === 'merge') {
+      getAllRepo(token).then((res) => {
         const hasIssuesRepo = res.filter(val => val.open_issues_count > 0 && !val.fork)
         const repos = new Map<string, IRepoWithPRs>()
         hasIssuesRepo.forEach((val) => {
@@ -66,19 +70,18 @@ export const RepoList = (props: IRepoListProps) => {
         const resRepo = [...repos.values()]
         setRepoList(resRepo)
         repoListCache.current = resRepo
+        onSelect(resRepo[0])
       }).finally(() => {
         setLoading(false)
       })
     }
-  }, [props.opType, props.token, props.userName])
+  }, [token, opType, userName, onSelect])
 
-  const [activeIndex, setActiveIndex] = useState(-1)
+  const [activeIndex, setActiveIndex] = useState(0)
   const handleClick = useCallback((index: number) => {
     setActiveIndex(index)
-    const repo = repoList[index]
-    console.log(repo.url)
-    console.log(repo.name)
-  }, [repoList])
+    onSelect(repoList[index])
+  }, [repoList, onSelect])
 
   const repoListEl = useMemo(() => {
     return repoList.map((repo, index) => (
@@ -112,9 +115,10 @@ export const RepoList = (props: IRepoListProps) => {
     },
     { wait: 300 },
   )
+  const { Search } = Input
   return (
     <div id="pr_checker_repo_list">
-      <Input placeholder="Input repo name" className="mb-4" onChange={run} allowClear />
+      <Search placeholder="Input repo name" className="mb-4" onChange={run} allowClear />
       <Button type="primary" className="mb-4 w-full" >
         { `${props.opType} all`}
       </Button>

@@ -75,7 +75,13 @@ export const PopupPage = () => {
         <div className="h-240px w-380px p-4 login" style={{ backgroundImage: `url(${loginBg})` }}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center">
-              <img src={logoImg} alt="pr-checker" className="w-30px h-30px mr-2" />
+              <a
+                href="https://github.com/baiwusanyu-c/pr-checker"
+                target="_blank" rel="noreferrer"
+                title="https://github.com/baiwusanyu-c/pr-checker"
+              >
+                <img src={logoImg} alt="pr-checker" className="w-30px h-30px mr-2" />
+              </a>
               <h1 className="text-gray-600 leading-1 m-0">
                 pr-checker
               </h1>
