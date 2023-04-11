@@ -33,3 +33,19 @@ export async function getAllRepo(token: string) {
   })
   return res
 }
+
+export async function getPRDetail(token: string, repo_name: string, pull_number: string | number) {
+  const res = await request(`${baseUrl}/repos/${repo_name}/pulls/${pull_number}`, {
+    method: 'GET',
+    token,
+  })
+  return res
+}
+
+export async function compareBranch(token: string, url) {
+  const res = await request(`${url}`, {
+    method: 'GET',
+    token,
+  })
+  return res
+}

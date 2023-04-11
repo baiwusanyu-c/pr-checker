@@ -154,6 +154,7 @@ export class GitApi {
    * @param mode
    */
   async needUpdate(repo_name: string, pr_info: IPRInfo, mode: 'rebase' | 'merge') {
+    // TODO refactor
     try {
       if (pr_info.mergeable_state === 'dirty')
         return { isNeedUpdate: false, reason: 'code conflict' }
