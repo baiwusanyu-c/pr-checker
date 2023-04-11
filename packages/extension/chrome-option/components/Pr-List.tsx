@@ -28,7 +28,6 @@ interface DataType {
 // TODO merge all select handle
 
 // TODO refactor
-// TODO: rerender fail ?
 export const PrList = (props: PrListProps) => {
   const [tableData, settableData] = useState<DataType[] >([])
   const tableDataCache = useRef<DataType[]>([])
@@ -114,7 +113,6 @@ export const PrList = (props: PrListProps) => {
         return new Promise((resolve) => {
           const run = async() => {
             if (props.opType === 'rebase') {
-              window.alert('a')
               //await rebasePrList(props.token, item.repoName, [item.number])
               setLoading(true)
               handleTableData(props.repoInfo.pullRequests)
