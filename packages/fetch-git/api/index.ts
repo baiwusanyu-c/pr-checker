@@ -10,7 +10,7 @@ export async function getUserInfo(token: string) {
   return res
 }
 
-export async function getRebaseRepo(token: string, username: string) {
+export async function getIssuesPR(token: string, username: string) {
   const res = await request(`${baseUrl}/search/issues`, {
     method: 'GET',
     token,
@@ -21,3 +21,16 @@ export async function getRebaseRepo(token: string, username: string) {
   })
   return res
 }
+
+export async function getAllRepo(token: string) {
+  const res = await request(`${baseUrl}/user/repos`, {
+    method: 'GET',
+    token,
+    params: {
+      type: 'owner',
+      per_page: 1000,
+    },
+  })
+  return res
+}
+

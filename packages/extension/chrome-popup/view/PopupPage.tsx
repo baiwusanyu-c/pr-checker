@@ -12,15 +12,6 @@ export const PopupPage = () => {
   const [opType, setOpType] = useState('')
   const { setItem, CACHE_KEYS, getItem } = useStorage()
 
-  const onFinish = useCallback(async(values) => {
-    // 存储操作类型和 TOKEN
-    await Promise.all([
-      setItem(CACHE_KEYS.OP_TYPE, opType),
-      setItem(CACHE_KEYS.TOKEN, values.token),
-    ])
-    chrome.runtime.openOptionsPage()
-  }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, opType, setItem])
-
   const [loading, setLoading] = useState(false)
   const [showInput, setShowInput] = useState(true)
   const [userInfo, setUserInfo] = useState({
@@ -67,6 +58,19 @@ export const PopupPage = () => {
     await setItem(CACHE_KEYS.OP_TYPE, opType)
     chrome.runtime.openOptionsPage()
   }, [CACHE_KEYS.OP_TYPE, setItem])
+
+  const onFinish = useCallback(async(values) => {
+    const userInfo = await getItem(CACHE_KEYS.USER_INFO)
+    if (!userInfo)
+      await getUserData(values.token)
+
+    // 存储操作类型和 TOKEN
+    await Promise.all([
+      setItem(CACHE_KEYS.OP_TYPE, opType),
+      setItem(CACHE_KEYS.TOKEN, values.token),
+    ])
+    chrome.runtime.openOptionsPage()
+  }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, CACHE_KEYS.USER_INFO, opType, setItem, getItem, getUserData])
   return (
         <div className="h-240px w-380px p-4 login" style={{ backgroundImage: `url(${loginBg})` }}>
           <div className="flex items-center justify-between mb-2">

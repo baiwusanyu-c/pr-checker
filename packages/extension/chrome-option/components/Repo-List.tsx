@@ -1,8 +1,7 @@
 import { Button, Input, Spin, Tooltip } from 'antd'
-import { getRebaseRepo } from '@pr-checker/fetchGit'
+import { getAllRepo, getIssuesPR } from '@pr-checker/fetchGit'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useThrottleFn } from 'ahooks'
-// TODO: merge data
 // TODO: logo data
 interface IRepoListProps {
   opType: string
@@ -24,9 +23,9 @@ export const RepoList = (props: IRepoListProps) => {
   const repoListCache = useRef<IRepoWithPRs[]>([])
   const [loading, setLoading] = useState(false)
   useEffect(() => {
+    setLoading(true)
     if (props.opType === 'rebase') {
-      setLoading(true)
-      getRebaseRepo(props.token, props.userName)
+      getIssuesPR(props.token, props.userName)
         .then((res) => {
           // 使用 map 避免重复遍历
           const repos = new Map<string, IRepoWithPRs>()
@@ -51,6 +50,25 @@ export const RepoList = (props: IRepoListProps) => {
         .finally(() => {
           setLoading(false)
         })
+    }
+    // merge 模式 我们只获取仓库信息
+    if (props.opType === 'merge') {
+      getAllRepo(props.token).then((res) => {
+        const hasIssuesRepo = res.filter(val => val.open_issues_count > 0 && !val.fork)
+        const repos = new Map<string, IRepoWithPRs>()
+        hasIssuesRepo.forEach((val) => {
+          const repoName = val.url.split('/').pop()!
+          const repoUName = val.url.split('repos/').pop()!
+          const repoURL = val.url
+          repos.set(repoURL, { name: repoName, url: repoURL, uname: repoUName, pullRequests: [val] })
+        })
+        // 将 map 转成数组，并设置到 state 里
+        const resRepo = [...repos.values()]
+        setRepoList(resRepo)
+        repoListCache.current = resRepo
+      }).finally(() => {
+        setLoading(false)
+      })
     }
   }, [props.opType, props.token, props.userName])
 
@@ -85,6 +103,7 @@ export const RepoList = (props: IRepoListProps) => {
       return item.name.toLowerCase().includes(searchParams.toLowerCase())
     })
     setRepoList(filterRes)
+    setActiveIndex(-1)
   }
 
   const { run } = useThrottleFn(
