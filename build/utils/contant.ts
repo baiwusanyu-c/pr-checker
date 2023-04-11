@@ -1,3 +1,4 @@
+
 export const CLI_ENTRY = {
   'cli/core': '../packages/cli/core/index.ts',
   'cli/bin': '../packages/cli/bin/index.ts',
@@ -9,7 +10,6 @@ export const CLI_DIR_MAP = {
   '@pr-checker/core': '../dist/cli/core/index[format]',
 }
 
-/* export const EXT_ENTRY = {
-  'extension/core': '../packages/extension/index.ts',
-  'extension/utils': '../utils/index.ts',
-} */
+export const EXT_ENTRY = {
+  'extension/chrome-background': '../packages/extension/chrome-background/index.ts',
+}
