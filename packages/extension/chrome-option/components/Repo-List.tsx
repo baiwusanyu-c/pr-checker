@@ -24,11 +24,10 @@ export const RepoList = (props: IRepoListProps) => {
   const [repoList, setRepoList] = useState<IRepoWithPRs[]>([])
   const repoListCache = useRef<IRepoWithPRs[]>([])
   const [loading, setLoading] = useState(false)
-  const { token, opType, userName, onSelect } = props
   useEffect(() => {
     setLoading(true)
-    if (opType === 'rebase') {
-      getIssuesPR(token, userName)
+    if (props.opType === 'rebase') {
+      getIssuesPR(props.token, props.userName)
         .then((res) => {
           // 使用 map 避免重复遍历
           const repos = new Map<string, IRepoWithPRs>()
@@ -49,15 +48,15 @@ export const RepoList = (props: IRepoListProps) => {
           const resRepo = [...repos.values()]
           setRepoList(resRepo)
           repoListCache.current = resRepo
-          onSelect(resRepo[0])
+          props.onSelect(resRepo[0])
         })
         .finally(() => {
           setLoading(false)
         })
     }
     // merge 模式 我们只获取仓库信息
-    if (opType === 'merge') {
-      getAllRepo(token).then((res) => {
+    if (props.opType === 'merge') {
+      getAllRepo(props.token).then((res) => {
         const hasIssuesRepo = res.filter(val => val.open_issues_count > 0 && !val.fork)
         const repos = new Map<string, IRepoWithPRs>()
         hasIssuesRepo.forEach((val) => {
@@ -70,25 +69,25 @@ export const RepoList = (props: IRepoListProps) => {
         const resRepo = [...repos.values()]
         setRepoList(resRepo)
         repoListCache.current = resRepo
-        onSelect(resRepo[0])
+        props.onSelect(resRepo[0])
       }).finally(() => {
         setLoading(false)
       })
     }
-  }, [token, opType, userName, onSelect])
+  }, [props.opType, props.token, props.userName])
 
   const [activeIndex, setActiveIndex] = useState(0)
   const handleClick = useCallback((index: number) => {
     setActiveIndex(index)
-    onSelect(repoList[index])
-  }, [repoList, onSelect])
+    props.onSelect(repoList[index])
+  }, [repoList])
 
   const repoListEl = useMemo(() => {
     return repoList.map((repo, index) => (
         <Tooltip title={repo.uname} key={repo.url}>
           <li
               style={activeIndex === index ? { backgroundColor: '#cafcec', color: '#1cd2a9' } : {}}
-              className="cursor-pointer flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main"
+              className="cursor-pointer flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main dark:text-white"
               onClick={() => handleClick(index)}
           >
             {/* <Avatar size={20} className="mr-2" shape="square">{value[0]}</Avatar> */}
@@ -118,7 +117,7 @@ export const RepoList = (props: IRepoListProps) => {
   const { Search } = Input
   return (
     <div id="pr_checker_repo_list">
-      <Search placeholder="Input repo name" className="mb-4" onChange={run} allowClear />
+      <Search placeholder="Input repo name" className="mb-4 !dark:bg-gray-7" onChange={run} allowClear />
       <Button type="primary" className="mb-4 w-full" >
         { `${props.opType} all`}
       </Button>

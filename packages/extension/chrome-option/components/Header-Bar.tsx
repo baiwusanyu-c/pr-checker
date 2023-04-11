@@ -1,6 +1,6 @@
 import { GithubOutlined, UserOutlined } from '@ant-design/icons'
 import { Avatar } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMount } from 'ahooks'
 import { CarbonSun } from './icon-sun'
 import { CarbonMoon } from './icon-moon'
@@ -36,13 +36,18 @@ export const HeaderBar = (props: HeaderBarProps = {
     else
       setDark(true)
   })
+
+  useEffect(() => {
+    const htmlEl = document.querySelector('html') as Element
+    htmlEl.className = dark ? 'dark' : ''
+  }, [dark])
   return (
-    <div id="header_bar" className="flex justify-between  items-center h-full">
+    <div id="header_bar" className="flex justify-between  items-center h-full py-2 px-8 dark:bg-gray-7">
       <div className="flex items-center">
         <a href={props.userInfo.html_url} target="_blank" rel="noreferrer" title={props.userInfo.html_url}>
           <Avatar size={46} src={props.userInfo.avatar_url} icon={<UserOutlined />} />
         </a>
-        <h1 className="mx-4 my-0 text-gray-600 text-xl">{props.repoInfo.uname}</h1>
+        <h1 className="mx-4 my-0 text-gray-600 text-xl dark:text-white">{props.repoInfo.uname}</h1>
       </div>
       <div className="flex items-center">
         <a

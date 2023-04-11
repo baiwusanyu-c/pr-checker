@@ -5,6 +5,7 @@ import store from '../store'
 import { OptionPage } from './view/OptionPage'
 import 'antd/dist/reset.css'
 import 'uno.css'
+
 ReactDOM.createRoot(document.getElementById('app') as HTMLElement).render(
   <ConfigProvider
     theme={{
