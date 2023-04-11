@@ -42,9 +42,17 @@ export async function getPRDetail(token: string, repo_name: string, pull_number:
   return res
 }
 
-export async function compareBranch(token: string, url) {
+export async function compareBranch(token: string, url: string) {
   const res = await request(`${url}`, {
     method: 'GET',
+    token,
+  })
+  return res
+}
+
+export async function rebasePr(token: string, repo_name: string, pull_number: string | number) {
+  const res = await request(`${baseUrl}/repos/${repo_name}/pulls/${pull_number}/update-branch`, {
+    method: 'PUT',
     token,
   })
   return res

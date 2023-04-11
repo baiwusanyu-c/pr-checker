@@ -5,7 +5,6 @@ import { RepoList } from '../components/Repo-List'
 import { HeaderBar } from '../components/Header-Bar'
 import { PrList } from '../components/Pr-List'
 import type { IRepoWithPRs } from '../components/Repo-List'
-import type React from 'react'
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 const { Header, Sider, Content } = Layout
 

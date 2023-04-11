@@ -1,8 +1,9 @@
 import { useThrottleFn } from 'ahooks'
-import { Button, Input, Space, Table, Tag, Tooltip } from 'antd'
+import { Button, Input, Modal, Space, Table, Tag, Tooltip, message } from 'antd'
+import { ExclamationCircleFilled } from '@ant-design/icons'
 import { useEffect, useRef, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
-import { compareBranch, getPRDetail } from '@pr-checker/fetchGit'
+import { compareBranch, getPRDetail, rebasePr } from '@pr-checker/fetchGit'
 import type { IRepoWithPRs } from './Repo-List'
 import type { ColumnsType } from 'antd/es/table'
 
@@ -25,7 +26,6 @@ interface DataType {
 // TODO merge
 // TODO merge all select handle
 
-// TODO rebase
 // TODO rebase all select handle
 
 // TODO refactor
@@ -96,6 +96,40 @@ export const PrList = (props: PrListProps) => {
     { wait: 300 },
   )
 
+  const { confirm } = Modal
+  const [messageApi, contextHolder] = message.useMessage()
+  const handleOp = async(item: DataType) => {
+    confirm({
+      title: 'Tips',
+      icon: <ExclamationCircleFilled />,
+      content: (
+        <div className="text-lg">
+        <p className="m-0">Do you want to rebase this pr?</p>
+          <span className="text-blue-500">[{item.repoName}]: </span><span className="text-main"> #{item.number}</span>
+        </div>),
+      onOk() {
+        return new Promise((resolve) => {
+          const run = async() => {
+            if (props.opType === 'rebase') {
+              try {
+                // TODO refactor with mul
+                const res = await rebasePr(props.token, item.repoName, item.number)
+                resolve(res)
+                messageApi.open({
+                  type: 'success',
+                  content: 'rebase success',
+                })
+              } catch (e) {
+                console.error(e)
+              }
+            }
+          }
+          run()
+        })
+      },
+    })
+  }
+
   const columns: ColumnsType<DataType> = [
     {
       title: 'PR Number',
@@ -155,7 +189,11 @@ export const PrList = (props: PrListProps) => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" disabled={record.opFlag !== 2}>{props.opType}</Button>
+          <Button type="primary" disabled={record.opFlag !== 2}
+                  onClick={() => handleOp(record)}
+          >
+            {props.opType}
+          </Button>
           <a title={record.html_url} href={record.html_url} target="_blank" rel="noreferrer">
             <Button type="primary" ghost>detail</Button>
           </a>
@@ -187,6 +225,7 @@ export const PrList = (props: PrListProps) => {
              pagination={false}
              rowSelection
       />
+      {contextHolder}
     </div>
   )
 }
