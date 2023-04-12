@@ -84,36 +84,38 @@ export const PrRebaseList = (props: PrListProps) => {
     const searchParams = e.target.value
     const filterRes = tableDataCache.current.filter((item) => {
       return item.title.toLowerCase().includes(searchParams.toLowerCase())
-        || item.author.toLowerCase().includes(searchParams.toLowerCase())
+          || item.author.toLowerCase().includes(searchParams.toLowerCase())
     })
     settableData(filterRes)
   }
 
   const { run } = useThrottleFn(
-    (e) => {
-      handleSearch(e)
-    },
-    { wait: 300 },
+      (e) => {
+        handleSearch(e)
+      },
+      { wait: 300 },
   )
 
   const { modal, message } = App.useApp()
   const { confirm } = modal
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const handleOp = async(item: DataType) => {
     confirm({
       title: 'Tips',
       icon: <ExclamationCircleFilled />,
       content: (
-        <div className="text-lg">
-        <p className="m-0">Do you want to rebase this PR?</p>
-          <span className="text-blue-500">[{item.repoName}]: </span>
-          <span className="text-main"> #{item.number}</span>
-        </div>),
+          <div className="text-lg">
+            <p className="m-0">Do you want to rebase this PR?</p>
+            <span className="text-blue-500">[{item.repoName}]: </span>
+            <span className="text-main"> #{item.number}</span>
+          </div>),
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
             await rebasePrList(props.token, item.repoName, [item.number])
             setLoading(true)
             handleTableData(props.repoInfo.pullRequests)
+            setSelectedRowKeys([]) // 清空选中状态
             resolve(true)
           }
           run()
@@ -137,8 +139,10 @@ export const PrRebaseList = (props: PrListProps) => {
   }
   let selectedNumberData: string[] = []
   const rowSelection = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+    selectedRowKeys,
+    onChange: (keys: React.Key[], selectedRows: DataType[]) => {
       selectedNumberData = selectedRows.map(v => v.number)
+      setSelectedRowKeys(keys)
     },
     getCheckboxProps: (record: DataType) => ({
       disabled: record.opFlag !== 2,
@@ -158,15 +162,16 @@ export const PrRebaseList = (props: PrListProps) => {
       title: 'Tips',
       icon: <ExclamationCircleFilled />,
       content: (
-            <div className="text-lg">
-              <p className="m-0">Do you want to rebase these PRs?</p>
-            </div>),
+          <div className="text-lg">
+            <p className="m-0">Do you want to rebase these PRs?</p>
+          </div>),
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
             await rebasePrList(props.token, props.repoInfo.uname, selectedNumberData)
             setLoading(true)
             handleTableData(props.repoInfo.pullRequests)
+            setSelectedRowKeys([]) // 清空选中状态
             resolve(true)
           }
           run()
@@ -186,13 +191,13 @@ export const PrRebaseList = (props: PrListProps) => {
       key: 'number',
       width: 120,
       render: (text: string, record) => (
-        <a title={record.html_url}
-           href={record.html_url}
-           target="_blank"
-           rel="noreferrer"
-        >
-          #{text}
-        </a>
+          <a title={record.html_url}
+             href={record.html_url}
+             target="_blank"
+             rel="noreferrer"
+          >
+            #{text}
+          </a>
       ),
     },
     {
@@ -203,7 +208,7 @@ export const PrRebaseList = (props: PrListProps) => {
       render: (_, { title }) => {
         return (<Tooltip placement="topLeft" title={title}>
           <span>{title}</span>
-                </Tooltip>)
+        </Tooltip>)
       },
     },
     {
@@ -239,56 +244,56 @@ export const PrRebaseList = (props: PrListProps) => {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
-        <Space size="middle">
-          <Button type="primary" disabled={record.opFlag !== 2}
-                  onClick={() => handleOp(record)}
-          >
-            {props.opType}
-          </Button>
-          <a title={record.html_url} href={record.html_url} target="_blank" rel="noreferrer">
-            <Button type="primary" ghost>detail</Button>
-          </a>
-        </Space>
+          <Space size="middle">
+            <Button type="primary" disabled={record.opFlag !== 2}
+                    onClick={() => handleOp(record)}
+            >
+              {props.opType}
+            </Button>
+            <a title={record.html_url} href={record.html_url} target="_blank" rel="noreferrer">
+              <Button type="primary" ghost>detail</Button>
+            </a>
+          </Space>
       ),
     },
   ]
 
   const { Search } = Input
   return (
-    <div id="pr_list" className="p-4 mt-2px dark:bg-gray-7"
-         style={{ height: 'calc(100% - 2px)' }}
-    >
-      <div className="w-100 flex items-center mb-6">
-        <Search placeholder="Title / Author"
-                className="flex-4 !dark:bg-gray-7"
-                onChange={run}
-                allowClear
-        />
-
-        <Button type="primary" className="mx-4 flex-1" onClick={handleOpAll}>
-          { `${props.opType} all`}
-        </Button>
-
-        <Tooltip title="reload">
-          <Button type="primary"
-                  shape="circle"
-                  onClick={reload}
-                  icon={<ReloadOutlined />}
+      <div id="pr_list" className="p-4 mt-2px dark:bg-gray-7"
+           style={{ height: 'calc(100% - 2px)' }}
+      >
+        <div className="w-100 flex items-center mb-6">
+          <Search placeholder="Title / Author"
+                  className="flex-4 !dark:bg-gray-7"
+                  onChange={run}
+                  allowClear
           />
-        </Tooltip>
-      </div>
 
-      <Table columns={columns}
-             rowSelection={{
-               ...rowSelection,
-             }}
-             loading={loading}
-             size="middle"
-             rowKey="id"
-             dataSource={tableData as RcTableProps<RecordType>['data']}
-             scroll={{ y: 'calc(100vh - 200px)' }}
-             pagination={false}
-      />
-    </div>
+          <Button type="primary" className="mx-4 flex-1" onClick={handleOpAll}>
+            { `${props.opType} all`}
+          </Button>
+
+          <Tooltip title="reload">
+            <Button type="primary"
+                    shape="circle"
+                    onClick={reload}
+                    icon={<ReloadOutlined />}
+            />
+          </Tooltip>
+        </div>
+
+        <Table columns={columns}
+               rowSelection={{
+                 ...rowSelection,
+               }}
+               loading={loading}
+               size="middle"
+               rowKey="id"
+               dataSource={tableData as RcTableProps<RecordType>['data']}
+               scroll={{ y: 'calc(100vh - 200px)' }}
+               pagination={false}
+        />
+      </div>
   )
 }
