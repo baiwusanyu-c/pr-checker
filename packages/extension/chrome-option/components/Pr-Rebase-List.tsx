@@ -1,6 +1,6 @@
 import { useThrottleFn } from 'ahooks'
 import { App, Button, Input, Space, Table, Tag, Tooltip } from 'antd'
-import { ExclamationCircleFilled } from '@ant-design/icons'
+import { ExclamationCircleFilled, ReloadOutlined } from '@ant-design/icons'
 import { useEffect, useRef, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
 import { compareBranch, getPRDetail, rebasePr } from '@pr-checker/fetchGit'
@@ -18,27 +18,23 @@ interface DataType {
   title: string
   repoName: string
   state: string
-  opFlag: 0 | 1 | 2
+  opFlag: 0 | 1 | 2 | 3
   html_url: string
   author: string
   id: number
 }
 
-// TODO merge
-// TODO merge all select handle
-
 // TODO refactor
-export const PrList = (props: PrListProps) => {
+export const PrRebaseList = (props: PrListProps) => {
   const [tableData, settableData] = useState<DataType[] >([])
   const tableDataCache = useRef<DataType[]>([])
   const [loading, setLoading] = useState(false)
   useEffect(() => {
     if (props.repoInfo.pullRequests.length > 0) {
       setLoading(true)
-      if (props.opType === 'rebase')
-        handleTableData(props.repoInfo.pullRequests)
+      handleTableData(props.repoInfo.pullRequests)
     }
-  }, [props.repoInfo, props.opType])
+  }, [props.repoInfo])
 
   async function handleTableData(prl: Record<any, any>[]) {
     // rebase
@@ -65,9 +61,12 @@ export const PrList = (props: PrListProps) => {
   async function compareBranchToUpdate(number: number, repo: string, res: DataType) {
     const prInfo = await getPRDetail(props.token, repo, number)
     res.author = prInfo.user.login
-    if (prInfo.mergeable_state === 'dirty' || prInfo.mergeable_state === 'unstable') {
+    if (prInfo.mergeable_state === 'dirty') {
       res.state = 'code conflict'
       res.opFlag = 1
+    } else if (prInfo.mergeable_state === 'unstable') {
+      res.state = 'pending'
+      res.opFlag = 3
     } else {
       let url = prInfo.base.repo.compare_url
       url = url.replace('{base}', prInfo.base.ref).replace('{head}', prInfo.head.label)
@@ -112,12 +111,10 @@ export const PrList = (props: PrListProps) => {
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            if (props.opType === 'rebase') {
-              //await rebasePrList(props.token, item.repoName, [item.number])
-              setLoading(true)
-              handleTableData(props.repoInfo.pullRequests)
-              resolve(true)
-            }
+            await rebasePrList(props.token, item.repoName, [item.number])
+            setLoading(true)
+            handleTableData(props.repoInfo.pullRequests)
+            resolve(true)
           }
           run()
         })
@@ -156,33 +153,32 @@ export const PrList = (props: PrListProps) => {
       })
       return
     }
-    if (props.opType === 'rebase') {
-      confirm({
-        title: 'Tips',
-        icon: <ExclamationCircleFilled />,
-        content: (
+
+    confirm({
+      title: 'Tips',
+      icon: <ExclamationCircleFilled />,
+      content: (
             <div className="text-lg">
               <p className="m-0">Do you want to rebase these PRs?</p>
             </div>),
-        onOk() {
-          return new Promise((resolve) => {
-            const run = async() => {
-              if (props.opType === 'rebase') {
-                //await rebasePrList(props.token, props.repoInfo.uname, selectedNumberData)
-                setLoading(true)
-                handleTableData(props.repoInfo.pullRequests)
-                resolve(true)
-              }
-            }
-            run()
-          })
-        },
-      })
-      // const res = await rebasePrList(props.token, item.repoName, [item.number])
-      // resolve(res)
-    }
+      onOk() {
+        return new Promise((resolve) => {
+          const run = async() => {
+            await rebasePrList(props.token, props.repoInfo.uname, selectedNumberData)
+            setLoading(true)
+            handleTableData(props.repoInfo.pullRequests)
+            resolve(true)
+          }
+          run()
+        })
+      },
+    })
   }
 
+  const reload = () => {
+    setLoading(true)
+    handleTableData(props.repoInfo.pullRequests)
+  }
   const columns: ColumnsType<DataType> = [
     {
       title: 'PR Number',
@@ -233,6 +229,8 @@ export const PrList = (props: PrListProps) => {
           return <Tag color="#87d068">🎉 {state}</Tag>
         else if (opFlag === 1)
           return <Tag color="#f50">🔥 {state}</Tag>
+        else if (opFlag === 3)
+          return <Tag color="#ffc53d">🎁 {state}</Tag>
         else
           return <Tag color="#2db7f5">🎯 {state}</Tag>
       },
@@ -266,9 +264,18 @@ export const PrList = (props: PrListProps) => {
                 onChange={run}
                 allowClear
         />
+
         <Button type="primary" className="mx-4 flex-1" onClick={handleOpAll}>
           { `${props.opType} all`}
         </Button>
+
+        <Tooltip title="reload">
+          <Button type="primary"
+                  shape="circle"
+                  onClick={reload}
+                  icon={<ReloadOutlined />}
+          />
+        </Tooltip>
       </div>
 
       <Table columns={columns}
