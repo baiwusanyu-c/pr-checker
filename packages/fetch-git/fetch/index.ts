@@ -100,7 +100,7 @@ function setHeader(contentType: string, config?: IReqConfig): Headers {
  */
 async function sendRequest(url: string, headers: Headers, config: IReqConfig) {
   if (!config.method || config.method === HttpMethod.get) {
-    const reqUrl = config.params ? `${url}?${Qs.stringify(config.params)}` : url
+    const reqUrl = config.params ? `${url}?${Qs.stringify(config.params)}&timestamp=${new Date().getTime()}` : `${url}?timestamp=${new Date().getTime()}`
     const res = await fetch(reqUrl, {
       headers,
     })

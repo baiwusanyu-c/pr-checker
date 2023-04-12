@@ -1,11 +1,10 @@
-import { ConfigProvider } from 'antd'
+import { App, ConfigProvider } from 'antd'
 import { Provider } from 'react-redux'
 import ReactDOM from 'react-dom/client'
 import store from '../store'
 import { OptionPage } from './view/OptionPage'
 import 'antd/dist/reset.css'
 import 'uno.css'
-import { App } from 'antd';
 ReactDOM.createRoot(document.getElementById('app') as HTMLElement).render(
   <ConfigProvider
     theme={{
