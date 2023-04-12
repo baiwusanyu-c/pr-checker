@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { getAllStorageSyncData } from '../../hooks/use-storage'
 import { RepoList } from '../components/Repo-List'
 import { HeaderBar } from '../components/Header-Bar'
-import { PrList } from '../components/Pr-List'
+import { PrRebaseList } from '../components/Pr-Rebase-List'
+import { PrMergeList } from '../components/Pr-Merge-List'
 import type { IRepoWithPRs } from '../components/Repo-List'
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 const { Header, Sider, Content } = Layout
@@ -18,7 +19,7 @@ export const OptionPage = () => {
   useEffect(() => {
     const run = async() => {
       // const data = await getAllStorageSyncData()
-      const data = { OP_TYPE: 'rebase', TOKEN: '', USER_INFO: '{"login":"baiwusanyu-c", "avatar_url": "https://avatars.githubusercontent.com/u/32354856?v=4"}' }
+      const data = { OP_TYPE: 'merge', TOKEN: '', USER_INFO: '{"login":"baiwusanyu-c", "avatar_url": "https://avatars.githubusercontent.com/u/32354856?v=4"}' }
       data.USER_INFO = JSON.parse(data.USER_INFO)
       setStoreData(data as Record<string, any>)
     }
@@ -62,7 +63,9 @@ export const OptionPage = () => {
               <HeaderBar userInfo={storeData.USER_INFO} repoInfo={selectRepo} />
             </Header>
             <Content style={{ height: 'calc(100vh - 64px)' }}>
-              <PrList opType={storeData.OP_TYPE} repoInfo={selectRepo} token={storeData.TOKEN} />
+              {storeData.OP_TYPE === 'rebase'
+                ? <PrRebaseList opType={storeData.OP_TYPE} repoInfo={selectRepo} token={storeData.TOKEN} />
+                : <PrMergeList opType={storeData.OP_TYPE} repoInfo={selectRepo} token={storeData.TOKEN} />}
             </Content>
           </Layout>
         </Layout>
