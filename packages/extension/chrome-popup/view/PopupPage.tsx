@@ -21,6 +21,7 @@ export const PopupPage = () => {
     name: '',
   })
 
+  // react-hooks/exhaustive-deps
   const getToken = useCallback(async() => {
     const token = await getItem(CACHE_KEYS.TOKEN)
     if (token)
@@ -29,6 +30,7 @@ export const PopupPage = () => {
       setShowInput(true)
 
     return token
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const getUserData = useCallback(async(token: string) => {
@@ -42,6 +44,7 @@ export const PopupPage = () => {
     })
     await setItem(CACHE_KEYS.USER_INFO, JSON.stringify(res))
     setLoading(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
