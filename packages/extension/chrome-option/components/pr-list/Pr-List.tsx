@@ -263,7 +263,7 @@ export const PrList = (props: PrListProps) => {
         />
 
         <Button type="primary" className="mx-4 flex-1" onClick={handleOpAll}>
-          { `${props.opType} all`}
+          { `${props.opType || 'rebase'} all`}
         </Button>
 
         <Tooltip title="reload">

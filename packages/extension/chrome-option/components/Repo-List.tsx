@@ -26,8 +26,8 @@ export const RepoList = (props: IRepoListProps) => {
   const [loading, setLoading] = useState(false)
   const { token, userName, opType, onSelect } = props
   useEffect(() => {
-    setLoading(true)
-    if (opType === 'rebase') {
+    token && setLoading(true)
+    if (opType === 'rebase' && token) {
       getIssuesPR(token, userName)
         .then((res) => {
           // 使用 map 避免重复遍历
@@ -56,7 +56,7 @@ export const RepoList = (props: IRepoListProps) => {
         })
     }
     // merge 模式 我们只获取仓库信息
-    if (opType === 'merge') {
+    if (opType === 'merge' && token) {
       getAllRepo(token).then((res) => {
         const hasIssuesRepo = res.filter(val => val.open_issues_count > 0 && !val.fork)
         const repos = new Map<string, IRepoWithPRs>()
@@ -122,7 +122,7 @@ export const RepoList = (props: IRepoListProps) => {
     <div id="pr_checker_repo_list">
       <Search placeholder="Input repo name" className="mb-4 !dark:bg-gray-7" onChange={run} allowClear />
       <Button type="primary" className="mb-4 w-full" >
-        { `${props.opType} all`}
+        { `${props.opType || 'rebase'} all`}
       </Button>
       <ul className="list-none p-0 min-w-1 border-1"
           style={loading ? { display: 'flex', justifyContent: 'center' } : {}}

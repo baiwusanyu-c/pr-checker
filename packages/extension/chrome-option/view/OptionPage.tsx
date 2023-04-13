@@ -1,5 +1,6 @@
 import { Layout } from 'antd'
 import { useEffect, useState } from 'react'
+import { isEmptyObj } from '@pr-checker/utils/common'
 import { getAllStorageSyncData } from '../../hooks/use-storage'
 import { RepoList } from '../components/Repo-List'
 import { HeaderBar } from '../components/Header-Bar'
@@ -9,19 +10,25 @@ import type { IRepoWithPRs } from '../components/Repo-List'
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 const { Header, Sider, Content } = Layout
 
-// TODO: token is empty ?
 export const OptionPage = () => {
   const [storeData, setStoreData] = useState<Record<string, string | any>>({
     USER_INFO: {
       login: '',
     },
   })
+
+  const [isLogin, setIsLogin] = useState(false)
   useEffect(() => {
     const run = async() => {
-      // const data = await getAllStorageSyncData()
-      const data = { OP_TYPE: 'merge', TOKEN: '', USER_INFO: '{"login":"baiwusanyu-c", "avatar_url": "https://avatars.githubusercontent.com/u/32354856?v=4"}' }
-      data.USER_INFO = JSON.parse(data.USER_INFO)
-      setStoreData(data as Record<string, any>)
+      const data = await getAllStorageSyncData()
+      if (!isEmptyObj(data)) {
+        // const data = { OP_TYPE: 'merge', TOKEN: '', USER_INFO: '{"login":"baiwusanyu-c", "avatar_url": "https://avatars.githubusercontent.com/u/32354856?v=4"}' }
+        data.USER_INFO = JSON.parse(data.USER_INFO)
+        setStoreData(data as Record<string, any>)
+        setIsLogin(true)
+      } else {
+        setIsLogin(false)
+      }
     }
     run()
   }, [])
@@ -60,7 +67,7 @@ export const OptionPage = () => {
           </Sider>
           <Layout>
             <Header className="shadow shadow-main p-0 bg-white">
-              <HeaderBar userInfo={storeData.USER_INFO} repoInfo={selectRepo} />
+              <HeaderBar userInfo={storeData.USER_INFO} repoInfo={selectRepo} isLogin={isLogin} />
             </Header>
             <Content style={{ height: 'calc(100vh - 64px)' }}>
               {storeData.OP_TYPE === 'rebase'
