@@ -29,7 +29,6 @@ interface DataType {
 }
 
 export const PrList = (props: PrListProps) => {
-
   const [tableData, setTableData] = useState<DataType[]>(() => [])
   const tableDataCache = useRef<DataType[]>([])
   const [loading, setLoading] = useState(false)

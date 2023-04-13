@@ -24,10 +24,11 @@ export const RepoList = (props: IRepoListProps) => {
   const [repoList, setRepoList] = useState<IRepoWithPRs[]>([])
   const repoListCache = useRef<IRepoWithPRs[]>([])
   const [loading, setLoading] = useState(false)
+  const { token, userName, opType, onSelect } = props
   useEffect(() => {
     setLoading(true)
-    if (props.opType === 'rebase') {
-      getIssuesPR(props.token, props.userName)
+    if (opType === 'rebase') {
+      getIssuesPR(token, userName)
         .then((res) => {
           // 使用 map 避免重复遍历
           const repos = new Map<string, IRepoWithPRs>()
@@ -48,15 +49,15 @@ export const RepoList = (props: IRepoListProps) => {
           const resRepo = [...repos.values()]
           setRepoList(resRepo)
           repoListCache.current = resRepo
-          props.onSelect(resRepo[0])
+          onSelect(resRepo[0])
         })
         .finally(() => {
           setLoading(false)
         })
     }
     // merge 模式 我们只获取仓库信息
-    if (props.opType === 'merge') {
-      getAllRepo(props.token).then((res) => {
+    if (opType === 'merge') {
+      getAllRepo(token).then((res) => {
         const hasIssuesRepo = res.filter(val => val.open_issues_count > 0 && !val.fork)
         const repos = new Map<string, IRepoWithPRs>()
         hasIssuesRepo.forEach((val) => {
@@ -69,17 +70,19 @@ export const RepoList = (props: IRepoListProps) => {
         const resRepo = [...repos.values()]
         setRepoList(resRepo)
         repoListCache.current = resRepo
-        props.onSelect(resRepo[0])
+        onSelect(resRepo[0])
       }).finally(() => {
         setLoading(false)
       })
     }
-  }, [props.opType, props.token, props.userName])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, userName, opType])
 
   const [activeIndex, setActiveIndex] = useState(0)
   const handleClick = useCallback((index: number) => {
     setActiveIndex(index)
-    props.onSelect(repoList[index])
+    onSelect(repoList[index])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repoList])
 
   const repoListEl = useMemo(() => {

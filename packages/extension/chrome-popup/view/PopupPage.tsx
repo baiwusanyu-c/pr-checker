@@ -21,7 +21,6 @@ export const PopupPage = () => {
     name: '',
   })
 
-  // react-hooks/exhaustive-deps
   const getToken = useCallback(async() => {
     const token = await getItem(CACHE_KEYS.TOKEN)
     if (token)
