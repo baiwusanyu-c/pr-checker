@@ -91,7 +91,7 @@ export const HeaderBar = (props: HeaderBarProps = {
     setTimeout(() => {
       location.reload()
     }, 500)
-  }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, setItem])
+  }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, CACHE_KEYS.USER_INFO, removeItem])
   return (
     <div id="header_bar" className="flex justify-between  items-center h-full py-2 px-8 dark:bg-gray-7">
       <div className="flex items-center">
@@ -141,7 +141,7 @@ export const HeaderBar = (props: HeaderBarProps = {
             >
               <img src={logoImg} alt="pr-checker" className="w-30px h-30px mr-2" />
             </a>
-            <h1 className="text-gray-600 leading-1 m-0">
+            <h1 className="text-gray-600 leading-1 m-0 dark:text-white">
               pr-checker
             </h1>
           </div>
@@ -157,7 +157,7 @@ export const HeaderBar = (props: HeaderBarProps = {
             layout="vertical "
             onFinish={onFinish}
         >
-          <Form.Item label={<span className="dark: text-gray-600">Github Token</span>} name="token" rules={[{ required: true }]}>
+          <Form.Item label={<span className="dark:text-white">Github Token</span>} name="token" rules={[{ required: true }]}>
             <Input.Password
                 placeholder="input github token"
                 visibilityToggle={{
