@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { getAllStorageSyncData } from '../../hooks/use-storage'
 import { RepoList } from '../components/Repo-List'
 import { HeaderBar } from '../components/Header-Bar'
-import { PrRebaseList } from '../components/Pr-Rebase-List'
-import { PrMergeList } from '../components/Pr-Merge-List'
+import { PrRebaseList } from '../components/pr-list/Pr-Rebase-List'
+import { PrMergeList } from '../components/pr-list/Pr-Merge-List'
 import type { IRepoWithPRs } from '../components/Repo-List'
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 const { Header, Sider, Content } = Layout

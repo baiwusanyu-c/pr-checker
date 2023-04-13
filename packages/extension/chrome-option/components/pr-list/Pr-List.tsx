@@ -1,16 +1,20 @@
-import { useThrottleFn } from 'ahooks'
 import { App, Button, Input, Space, Table, Tag, Tooltip } from 'antd'
 import { ExclamationCircleFilled, ReloadOutlined } from '@ant-design/icons'
 import { useEffect, useRef, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
 import { compareBranch, getPRDetail } from '@pr-checker/fetchGit'
+import { useSearch } from '../../../hooks/use-search'
 import type React from 'react'
-import type { IRepoWithPRs } from './Repo-List'
+import type { IRepoWithPRs } from '../Repo-List'
 import type { ColumnsType } from 'antd/es/table'
+
+export declare type opFlag = 0 | 1 | 2 | 3
 interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs
   token: string
+  disablePolicy: (flag: opFlag) => boolean
+  updatePr: (token: string, repoName: string, numberArr: number[] | string[]) => void
 }
 
 interface DataType {
@@ -18,28 +22,34 @@ interface DataType {
   title: string
   repoName: string
   state: string
-  opFlag: 0 | 1 | 2 | 3
+  opFlag: opFlag
   html_url: string
   author: string
   id: number
 }
 
-// TODO refactor
-export const PrMergeList = (props: PrListProps) => {
+export const PrList = (props: PrListProps) => {
   const [tableData, setTableData] = useState<DataType[] >([])
   const tableDataCache = useRef<DataType[]>([])
   const [loading, setLoading] = useState(false)
   useEffect(() => {
+    setLoading(true)
+    setTableData([])
     if (props.repoInfo.pullRequests.length > 0)
-      setLoading(true)
-      // TODO handleTableData(props.repoInfo.pullRequests)
+      handleTableData(props.repoInfo.pullRequests)
+    else
+      setTimeout(() => setLoading(false), 300)
   }, [props.repoInfo])
 
-  // TODO
   async function handleTableData(prl: Record<any, any>[]) {
-    // rebase
+    setTableData([])
+    if (prl && prl.length === 0) {
+      setLoading(false)
+      return
+    }
+
     const res = await Promise.all(createRunList(prl.length, async(i: number) => {
-      const repo = prl[i].repository_url.split('repos/').pop()
+      const repo = props.repoInfo.uname
       let res = {
         number: prl[i].number,
         title: prl[i].title,
@@ -58,7 +68,6 @@ export const PrMergeList = (props: PrListProps) => {
     tableDataCache.current = res
   }
 
-  // TODO
   async function compareBranchToUpdate(number: number, repo: string, res: DataType) {
     const prInfo = await getPRDetail(props.token, repo, number)
     res.author = prInfo.user.login
@@ -81,21 +90,7 @@ export const PrMergeList = (props: PrListProps) => {
     return res
   }
 
-  const handleSearch = (e) => {
-    const searchParams = e.target.value
-    const filterRes = tableDataCache.current.filter((item) => {
-      return item.title.toLowerCase().includes(searchParams.toLowerCase())
-          || item.author.toLowerCase().includes(searchParams.toLowerCase())
-    })
-    setTableData(filterRes)
-  }
-
-  const { run } = useThrottleFn(
-    (e) => {
-      handleSearch(e)
-    },
-    { wait: 300 },
-  )
+  const { search } = useSearch(tableDataCache, setTableData)
 
   const { modal, message } = App.useApp()
   const { confirm } = modal
@@ -105,17 +100,18 @@ export const PrMergeList = (props: PrListProps) => {
       title: 'Tips',
       icon: <ExclamationCircleFilled />,
       content: (
-          <div className="text-lg">
-            <p className="m-0">Do you want to merge this PR?</p>
-            <span className="text-blue-500">[{item.repoName}]: </span>
-            <span className="text-main"> #{item.number}</span>
-          </div>),
+        <div className="text-lg">
+          <p className="m-0">Do you want to {props.opType} this PR?</p>
+          <span className="text-blue-500">[{item.repoName}]: </span>
+          <span className="text-main"> #{item.number}</span>
+        </div>),
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            await mergePrList(props.token, item.repoName, [item.number])
+            // TODO
+            await props.updatePr(props.token, item.repoName, [item.number])
             setLoading(true)
-            // TODO handleTableData(props.repoInfo.pullRequests)
+            handleTableData(props.repoInfo.pullRequests)
             setSelectedRowKeys([]) // 清空选中状态
             resolve(true)
           }
@@ -125,19 +121,6 @@ export const PrMergeList = (props: PrListProps) => {
     })
   }
 
-  async function mergePrList(token: string, repoName: string, numberArr: number[] | string[]) {
-    try {
-      await Promise.all(createRunList(numberArr.length, async(i: number) => {
-        // TODO await rebasePr(token, repoName, numberArr[i])
-      }))
-      message.open({
-        type: 'success',
-        content: 'merge success',
-      })
-    } catch (e) {
-      console.error(e)
-    }
-  }
   let selectedNumberData: string[] = []
   const rowSelection = {
     selectedRowKeys,
@@ -146,7 +129,7 @@ export const PrMergeList = (props: PrListProps) => {
       setSelectedRowKeys(keys)
     },
     getCheckboxProps: (record: DataType) => ({
-      disabled: record.opFlag !== 2,
+      disabled: props.disablePolicy(record.opFlag),
     }),
   }
 
@@ -163,15 +146,15 @@ export const PrMergeList = (props: PrListProps) => {
       title: 'Tips',
       icon: <ExclamationCircleFilled />,
       content: (
-          <div className="text-lg">
-            <p className="m-0">Do you want to merge these PRs?</p>
-          </div>),
+        <div className="text-lg">
+          <p className="m-0">Do you want to {props.opType} these PRs?</p>
+        </div>),
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            await mergePrList(props.token, props.repoInfo.uname, selectedNumberData)
+            await props.updatePr(props.token, props.repoInfo.uname, selectedNumberData)
             setLoading(true)
-            // TODO: handleTableData(props.repoInfo.pullRequests)
+            handleTableData(props.repoInfo.pullRequests)
             setSelectedRowKeys([]) // 清空选中状态
             resolve(true)
           }
@@ -183,7 +166,7 @@ export const PrMergeList = (props: PrListProps) => {
 
   const reload = () => {
     setLoading(true)
-    // TODO: handleTableData(props.repoInfo.pullRequests)
+    handleTableData(props.repoInfo.pullRequests)
   }
   const columns: ColumnsType<DataType> = [
     {
@@ -192,13 +175,13 @@ export const PrMergeList = (props: PrListProps) => {
       key: 'number',
       width: 120,
       render: (text: string, record) => (
-          <a title={record.html_url}
-             href={record.html_url}
-             target="_blank"
-             rel="noreferrer"
-          >
-            #{text}
-          </a>
+        <a title={record.html_url}
+           href={record.html_url}
+           target="_blank"
+           rel="noreferrer"
+        >
+          #{text}
+        </a>
       ),
     },
     {
@@ -245,56 +228,56 @@ export const PrMergeList = (props: PrListProps) => {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
-          <Space size="middle">
-            <Button type="primary" disabled={record.opFlag !== 2}
-                    onClick={() => handleOp(record)}
-            >
-              {props.opType}
-            </Button>
-            <a title={record.html_url} href={record.html_url} target="_blank" rel="noreferrer">
-              <Button type="primary" ghost>detail</Button>
-            </a>
-          </Space>
+        <Space size="middle">
+          <Button type="primary" disabled={props.disablePolicy(record.opFlag)}
+                  onClick={() => handleOp(record)}
+          >
+            {props.opType}
+          </Button>
+          <a title={record.html_url} href={record.html_url} target="_blank" rel="noreferrer">
+            <Button type="primary" ghost>detail</Button>
+          </a>
+        </Space>
       ),
     },
   ]
 
   const { Search } = Input
   return (
-      <div id="pr_list" className="p-4 mt-2px dark:bg-gray-7"
-           style={{ height: 'calc(100% - 2px)' }}
-      >
-        <div className="w-100 flex items-center mb-6">
-          <Search placeholder="Title / Author"
-                  className="flex-4 !dark:bg-gray-7"
-                  onChange={run}
-                  allowClear
-          />
-
-          <Button type="primary" className="mx-4 flex-1" onClick={handleOpAll}>
-            { `${props.opType} all`}
-          </Button>
-
-          <Tooltip title="reload">
-            <Button type="primary"
-                    shape="circle"
-                    onClick={reload}
-                    icon={<ReloadOutlined />}
-            />
-          </Tooltip>
-        </div>
-
-        <Table columns={columns}
-               rowSelection={{
-                 ...rowSelection,
-               }}
-               loading={loading}
-               size="middle"
-               rowKey="id"
-               dataSource={tableData as RcTableProps<RecordType>['data']}
-               scroll={{ y: 'calc(100vh - 200px)' }}
-               pagination={false}
+    <div id="pr_list" className="p-4 mt-2px dark:bg-gray-7"
+         style={{ height: 'calc(100% - 2px)' }}
+    >
+      <div className="w-100 flex items-center mb-6">
+        <Search placeholder="Title / Author"
+                className="flex-4 !dark:bg-gray-7"
+                onChange={search}
+                allowClear
         />
+
+        <Button type="primary" className="mx-4 flex-1" onClick={handleOpAll}>
+          { `${props.opType} all`}
+        </Button>
+
+        <Tooltip title="reload">
+          <Button type="primary"
+                  shape="circle"
+                  onClick={reload}
+                  icon={<ReloadOutlined />}
+          />
+        </Tooltip>
       </div>
+
+      <Table columns={columns}
+             rowSelection={{
+               ...rowSelection,
+             }}
+             loading={loading}
+             size="middle"
+             rowKey="id"
+             dataSource={tableData as RcTableProps<RecordType>['data']}
+             scroll={{ y: 'calc(100vh - 200px)' }}
+             pagination={false}
+      />
+    </div>
   )
 }

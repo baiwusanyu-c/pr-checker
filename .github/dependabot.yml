@@ -3,10 +3,9 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: monthly
+      interval: daily
     open-pull-requests-limit: 10
     allow:
       - dependency-type: all
     ignore:
       - dependency-name: chalk
-      - dependency-name: eslint

@@ -57,3 +57,11 @@ export async function rebasePr(token: string, repo_name: string, pull_number: st
   })
   return res
 }
+
+export async function getPRs(token: string, repo_name: string) {
+  const res = await request(`${baseUrl}/repos/${repo_name}/pulls`, {
+    method: 'GET',
+    token,
+  })
+  return res
+}
