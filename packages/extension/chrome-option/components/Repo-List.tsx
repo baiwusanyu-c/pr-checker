@@ -85,7 +85,7 @@ export const RepoList = (props: IRepoListProps) => {
 
   const repoListEl = useMemo(() => {
     return repoList.map((repo, index) => (
-        <Tooltip title={repo.uname} key={repo.url}>
+        <Tooltip title={repo.uname} key={repo.url} placement="right">
           <li
               style={activeIndex === index ? { backgroundColor: '#cafcec', color: '#1cd2a9' } : {}}
               className="cursor-pointer flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main dark:text-white"

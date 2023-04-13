@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
 import { getPRs } from '@pr-checker/fetchGit'
 import { App } from 'antd'
@@ -11,23 +11,24 @@ interface PrListProps {
   token: string
 }
 
-
 export const PrMergeList = (props: PrListProps) => {
   const [repoInfoInner, setRepoInfoInner] = useState(props.repoInfo)
-  useEffect(() => {
-    if (props.repoInfo.pullRequests.length > 0)
-      getPRsByRepo(props.repoInfo.uname)
-  }, [props.repoInfo])
 
-  async function getPRsByRepo(uname: string) {
-    const res = await getPRs(props.token, uname)
-    setRepoInfoInner({ ...props.repoInfo, pullRequests: res })
-  }
+  const getPRsByRepo = useCallback(async(repoInfo: IRepoWithPRs) => {
+    const res = await getPRs(props.token, repoInfo.uname)
+    setRepoInfoInner({ ...repoInfo, pullRequests: res })
+  }, [props.token])
+
+  useEffect(() => {
+    if (props.repoInfo?.pullRequests?.length > 0)
+      getPRsByRepo(props.repoInfo)
+  }, [props.repoInfo, getPRsByRepo])
 
   const { message } = App.useApp()
   async function mergePrList(token: string, repoName: string, numberArr: number[] | string[]) {
     try {
       await Promise.all(createRunList(numberArr.length, async(i: number) => {
+        console.log(i)
         // TODO add to merge queue
         // TODO await rebasePr(token, repoName, numberArr[i])
       }))
