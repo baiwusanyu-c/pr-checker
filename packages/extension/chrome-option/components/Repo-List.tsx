@@ -2,7 +2,6 @@ import { Button, Input, Spin, Tooltip } from 'antd'
 import { getAllRepo, getIssuesPR } from '@pr-checker/fetchGit'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useThrottleFn } from 'ahooks'
-// TODO: logo data
 // TODO all select handle
 interface IRepoListProps {
   opType: string

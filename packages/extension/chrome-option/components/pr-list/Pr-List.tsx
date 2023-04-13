@@ -118,7 +118,6 @@ export const PrList = (props: PrListProps) => {
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            // TODO
             await props.updatePr(props.token, item.repoName, [item.number])
             setLoading(true)
             handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
