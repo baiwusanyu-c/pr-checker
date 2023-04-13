@@ -1,4 +1,4 @@
-import { Layout } from 'antd'
+import { ConfigProvider, Layout, theme } from 'antd'
 import { useEffect, useState } from 'react'
 import { isEmptyObj } from '@pr-checker/utils/common'
 import { getAllStorageSyncData } from '../../hooks/use-storage'
@@ -42,7 +42,20 @@ export const OptionPage = () => {
   const handleSelect = (data: IRepoWithPRs) => {
     setSelectRepo(data)
   }
+
+  const [dark, setDark] = useState(false)
+  const toggleTheme = (value: boolean) => {
+    setDark(value)
+  }
   return (
+      <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#1cd2a9',
+            },
+            algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+          }}
+      >
       <div id="pr_checker_option">
         <Layout>
           <Sider className="shadow-xl p-2 !bg-white !dark:bg-gray-7 dark:shadow-xl dark:shadow-main" >
@@ -67,7 +80,7 @@ export const OptionPage = () => {
           </Sider>
           <Layout>
             <Header className="shadow shadow-main p-0 bg-white">
-              <HeaderBar userInfo={storeData.USER_INFO} repoInfo={selectRepo} isLogin={isLogin} />
+              <HeaderBar userInfo={storeData.USER_INFO} repoInfo={selectRepo} isLogin={isLogin} toggleTheme={toggleTheme} />
             </Header>
             <Content style={{ height: 'calc(100vh - 64px)' }}>
               {storeData.OP_TYPE === 'rebase'
@@ -77,5 +90,6 @@ export const OptionPage = () => {
           </Layout>
         </Layout>
       </div>
+      </ConfigProvider>
   )
 }

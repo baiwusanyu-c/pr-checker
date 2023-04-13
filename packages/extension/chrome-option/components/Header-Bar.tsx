@@ -16,6 +16,7 @@ interface HeaderBarProps {
   }
   repoInfo: IRepoWithPRs
   isLogin?: boolean
+  toggleTheme?: (boolean) => void
 }
 export const HeaderBar = (props: HeaderBarProps = {
   userInfo: {
@@ -33,13 +34,14 @@ export const HeaderBar = (props: HeaderBarProps = {
   const toggleTheme = (value: boolean) => {
     setDark(value)
     localStorage.setItem('dark', value.toString())
+    props.toggleTheme && props.toggleTheme(value)
   }
   useMount(() => {
     const dark = localStorage.getItem('dark')
     if (!dark || dark === 'false')
-      setDark(false)
+      toggleTheme(false)
     else
-      setDark(true)
+      toggleTheme(true)
   })
 
   useEffect(() => {
@@ -155,7 +157,7 @@ export const HeaderBar = (props: HeaderBarProps = {
             layout="vertical "
             onFinish={onFinish}
         >
-          <Form.Item label="Github Token" name="token" rules={[{ required: true }]}>
+          <Form.Item label={<span className="dark: text-gray-600">Github Token</span>} name="token" rules={[{ required: true }]}>
             <Input.Password
                 placeholder="input github token"
                 visibilityToggle={{
