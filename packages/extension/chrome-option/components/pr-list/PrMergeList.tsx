@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
-import { getPRs } from '@pr-checker/fetchGit'
+import { batchesMergePr, getPRs } from '@pr-checker/fetchGit'
 import { App } from 'antd'
 import { PrList } from './PrList'
 import type { opFlag } from './PrList'
@@ -9,6 +9,7 @@ interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs
   token: string
+  isProUser: boolean
 }
 
 export const PrMergeList = (props: PrListProps) => {
@@ -27,11 +28,22 @@ export const PrMergeList = (props: PrListProps) => {
   const { message } = App.useApp()
   async function mergePrList(token: string, repoName: string, numberArr: number[] | string[]) {
     try {
-      await Promise.all(createRunList(numberArr.length, async(i: number) => {
-        console.log(i)
-        // TODO add to merge queue
-        // TODO await rebasePr(token, repoName, numberArr[i])
-      }))
+      if (props.isProUser) {
+        const params = {
+          base: 'main', // 目标仓库分支
+          head: ['feature-branch-1', 'feature-branch-2'], // pr 分支名
+          commit_message: `【pr-checker】Merging pull requests: ${numberArr.map(v=> `#${v} `)}`,
+          merge_method: 'squash',
+        }
+        await batchesMergePr(token, repoName)
+      } else {
+        await Promise.all(createRunList(numberArr.length, async(i: number) => {
+          console.log(i)
+          // TODO add to merge queue
+          // TODO await rebasePr(token, repoName, numberArr[i])
+        }))
+      }
+
       message.open({
         type: 'success',
         content: `${props.opType} success`,

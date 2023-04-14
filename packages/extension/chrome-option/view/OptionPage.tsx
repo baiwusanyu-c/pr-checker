@@ -14,6 +14,7 @@ export const OptionPage = () => {
   const [storeData, setStoreData] = useState<Record<string, string | any>>({
     USER_INFO: {
       login: '',
+      isPro: false,
     },
   })
 
@@ -86,7 +87,7 @@ export const OptionPage = () => {
             <Content style={{ height: 'calc(100vh - 64px)' }}>
               {storeData.OP_TYPE === 'rebase'
                 ? <PrRebaseList opType={storeData.OP_TYPE} repoInfo={selectRepo} token={storeData.TOKEN} />
-                : <PrMergeList opType={storeData.OP_TYPE} repoInfo={selectRepo} token={storeData.TOKEN} />}
+                : <PrMergeList isProUser={storeData.USER_INFO.isPro} opType={storeData.OP_TYPE} repoInfo={selectRepo} token={storeData.TOKEN} />}
             </Content>
           </Layout>
         </Layout>

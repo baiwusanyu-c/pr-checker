@@ -65,3 +65,13 @@ export async function getPRs(token: string, repo_name: string) {
   })
   return res
 }
+
+export async function batchesMergePr(
+  token: string,
+  repo_name: string) {
+  const res = await request(`${baseUrl}/repos/${repo_name}/merges`, {
+    method: 'PUT',
+    token,
+  })
+  return res
+}

@@ -17,6 +17,8 @@ export const LoginForm = (props: LoginFormProps) => {
     setLoading(true)
     const res = await getUserInfo(token)
     onLogin && onLogin(res)
+    if (res.plan)
+      res.isPro = res.plan.name === 'pro'
     await setItem(CACHE_KEYS.USER_INFO, JSON.stringify(res))
     setLoading(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
