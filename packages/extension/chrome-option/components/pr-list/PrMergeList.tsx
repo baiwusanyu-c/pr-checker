@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
 import { getPRs } from '@pr-checker/fetchGit'
 import { App } from 'antd'
-import { PrList } from './Pr-List'
-import type { opFlag } from './Pr-List'
-import type { IRepoWithPRs } from '../Repo-List'
+import { PrList } from './PrList'
+import type { opFlag } from './PrList'
+import type { IRepoWithPRs } from '../RepoList'
 interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs

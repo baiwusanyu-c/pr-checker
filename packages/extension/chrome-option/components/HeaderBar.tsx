@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { useMount } from 'ahooks'
 import { getUserInfo } from '@pr-checker/fetchGit'
 import { useStorage } from '../../hooks/use-storage'
-import { CarbonSun } from './Icon-Sun'
-import { CarbonMoon } from './Icon-Moon'
-import type { IRepoWithPRs } from './Repo-List'
+import { CarbonSun } from '../../components/IconSun'
+import { CarbonMoon } from '../../components/IconMoon'
+import type { IRepoWithPRs } from './RepoList'
 import '../../assets/styles/login.css'
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 interface HeaderBarProps {

@@ -5,7 +5,7 @@ import { createRunList } from '@pr-checker/utils/common'
 import { compareBranch, getPRDetail } from '@pr-checker/fetchGit'
 import { useSearch } from '../../../hooks/use-search'
 import type React from 'react'
-import type { IRepoWithPRs } from '../Repo-List'
+import type { IRepoWithPRs } from '../RepoList'
 import type { ColumnsType } from 'antd/es/table'
 
 export declare type opFlag = 0 | 1 | 2 | 3

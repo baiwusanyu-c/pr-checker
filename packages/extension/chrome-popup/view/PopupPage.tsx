@@ -4,8 +4,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { getUserInfo } from '@pr-checker/fetchGit'
 import { GithubOutlined, UserOutlined } from '@ant-design/icons'
 import { useStorage } from '../../hooks/use-storage'
-
-const loginBg = new URL('../../assets/img/login-bg.png', import.meta.url).href
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 export const PopupPage = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
@@ -74,7 +72,7 @@ export const PopupPage = () => {
     chrome.runtime.openOptionsPage()
   }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, CACHE_KEYS.USER_INFO, opType, setItem, getItem, getUserData])
   return (
-        <div className="h-240px w-380px p-4 login" style={{ backgroundImage: `url(${loginBg})` }}>
+        <div className="h-240px w-380px p-4 login">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center">
               <a

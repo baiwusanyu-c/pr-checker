@@ -2,11 +2,11 @@ import { ConfigProvider, Layout, theme } from 'antd'
 import { useEffect, useState } from 'react'
 import { isEmptyObj } from '@pr-checker/utils/common'
 import { getAllStorageSyncData } from '../../hooks/use-storage'
-import { RepoList } from '../components/Repo-List'
-import { HeaderBar } from '../components/Header-Bar'
-import { PrRebaseList } from '../components/pr-list/Pr-Rebase-List'
-import { PrMergeList } from '../components/pr-list/Pr-Merge-List'
-import type { IRepoWithPRs } from '../components/Repo-List'
+import { RepoList } from '../components/RepoList'
+import { HeaderBar } from '../components/HeaderBar'
+import { PrRebaseList } from '../components/pr-list/PrRebaseList'
+import { PrMergeList } from '../components/pr-list/PrMergeList'
+import type { IRepoWithPRs } from '../components/RepoList'
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 const { Header, Sider, Content } = Layout
 
