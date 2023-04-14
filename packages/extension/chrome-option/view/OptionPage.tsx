@@ -1,4 +1,4 @@
-import { ConfigProvider, Layout, theme } from 'antd'
+import { App, ConfigProvider, Layout, theme } from 'antd'
 import { useEffect, useState } from 'react'
 import { isEmptyObj } from '@pr-checker/utils/common'
 import { getAllStorageSyncData } from '../../hooks/use-storage'
@@ -56,6 +56,7 @@ export const OptionPage = () => {
             algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
           }}
       >
+        <App>
       <div id="pr_checker_option">
         <Layout>
           <Sider className="shadow-xl p-2 !bg-white !dark:bg-gray-7 dark:shadow-xl dark:shadow-main" >
@@ -90,6 +91,7 @@ export const OptionPage = () => {
           </Layout>
         </Layout>
       </div>
+        </App>
       </ConfigProvider>
   )
 }
