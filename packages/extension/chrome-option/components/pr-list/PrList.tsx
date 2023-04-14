@@ -129,11 +129,11 @@ export const PrList = (props: PrListProps) => {
     })
   }
 
-  let selectedNumberData: string[] = []
+  const [selectedNumberData, setSelectedNumberData] = useState([])
   const rowSelection = {
     selectedRowKeys,
     onChange: (keys: React.Key[], selectedRows: DataType[]) => {
-      selectedNumberData = selectedRows.map(v => v.number)
+      setSelectedNumberData(selectedRows.map(v => v.number))
       setSelectedRowKeys(keys)
     },
     getCheckboxProps: (record: DataType) => ({
