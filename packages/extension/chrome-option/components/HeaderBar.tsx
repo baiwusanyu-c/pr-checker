@@ -1,14 +1,14 @@
 import { GithubOutlined, PoweroffOutlined, UserOutlined } from '@ant-design/icons'
-import { Avatar, Button, Form, Input, Modal, Popconfirm, Spin } from 'antd'
+import { Avatar, Button, Modal, Popconfirm } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import { useMount } from 'ahooks'
-import { getUserInfo } from '@pr-checker/fetchGit'
 import { useStorage } from '../../hooks/use-storage'
 import { CarbonSun } from '../../components/IconSun'
 import { CarbonMoon } from '../../components/IconMoon'
+import { LoginContent } from '../../components/LoginContent'
+import { LoginForm } from '../../components/LoginForm'
 import type { IRepoWithPRs } from './RepoList'
 import '../../assets/styles/login.css'
-const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 interface HeaderBarProps {
   userInfo: {
     avatar_url: string
@@ -49,37 +49,15 @@ export const HeaderBar = (props: HeaderBarProps = {
     htmlEl.className = dark ? 'dark' : ''
   }, [dark])
 
-  // TODO refactor with popup
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [passwordVisible, setPasswordVisible] = useState(false)
-  const [opType, setOpType] = useState('')
-  const { setItem, CACHE_KEYS, getItem, removeItem } = useStorage()
+  const { CACHE_KEYS, removeItem } = useStorage()
 
-  const [loading, setLoading] = useState(false)
-  const getUserData = useCallback(async(token: string) => {
-    setLoading(true)
-    const res = await getUserInfo(token)
-    await setItem(CACHE_KEYS.USER_INFO, JSON.stringify(res))
-    setLoading(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const onFinish = useCallback(async(values) => {
-    const userInfo = await getItem(CACHE_KEYS.USER_INFO)
-    if (!userInfo)
-      await getUserData(values.token)
-
-    // 存储操作类型和 TOKEN
-    await Promise.all([
-      setItem(CACHE_KEYS.OP_TYPE, opType),
-      setItem(CACHE_KEYS.TOKEN, values.token),
-    ])
+  const onFinished = () => {
     setIsModalOpen(false)
     setTimeout(() => {
       location.reload()
     }, 500)
-  }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, CACHE_KEYS.USER_INFO, opType, setItem, getItem, getUserData])
-
+  }
   const logout = useCallback(async() => {
     // 存储操作类型和 TOKEN
     await Promise.all([
@@ -87,10 +65,7 @@ export const HeaderBar = (props: HeaderBarProps = {
       removeItem(CACHE_KEYS.TOKEN),
       removeItem(CACHE_KEYS.USER_INFO),
     ])
-    setIsModalOpen(false)
-    setTimeout(() => {
-      location.reload()
-    }, 500)
+    onFinished()
   }, [CACHE_KEYS.OP_TYPE, CACHE_KEYS.TOKEN, CACHE_KEYS.USER_INFO, removeItem])
   return (
     <div id="header_bar" className="flex justify-between  items-center h-full py-2 px-8 dark:bg-gray-7">
@@ -131,57 +106,13 @@ export const HeaderBar = (props: HeaderBarProps = {
         }
       </div>
       {/* login modal */}
-      <Modal title={
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center">
-            <a
-                href="https://github.com/baiwusanyu-c/pr-checker"
-                target="_blank" rel="noreferrer"
-                title="https://github.com/baiwusanyu-c/pr-checker"
-            >
-              <img src={logoImg} alt="pr-checker" className="w-30px h-30px mr-2" />
-            </a>
-            <h1 className="text-gray-600 leading-1 m-0 dark:text-white">
-              pr-checker
-            </h1>
-          </div>
-        </div>
-      }
+      <Modal title={<LoginContent cls="flex items-center" showGH={false} />}
              wrapClassName="login-modal"
              onCancel={() => setIsModalOpen(false)}
              open={isModalOpen}
              footer={null}
       >
-        <Spin spinning={loading} tip="Loading...">
-        <Form
-            layout="vertical "
-            onFinish={onFinish}
-        >
-          <Form.Item label={<span className="dark:text-white">Github Token</span>} name="token" rules={[{ required: true }]}>
-            <Input.Password
-                placeholder="input github token"
-                visibilityToggle={{
-                  visible: passwordVisible,
-                  onVisibleChange: setPasswordVisible,
-                }}
-            />
-          </Form.Item>
-          <Form.Item label=" ">
-            <div className="flex justify-center items-center w-full">
-              <Button className="mx-4" type="primary"
-                      htmlType="submit"
-                      onClick={() => setOpType('merge')}
-              >Merge PR
-              </Button>
-              <Button className="mx-4" type="primary"
-                      htmlType="submit"
-                      onClick={() => setOpType('rebase')}
-              >Rebase PR
-              </Button>
-            </div>
-          </Form.Item>
-        </Form>
-        </Spin>
+        <LoginForm isExt={false} onFinished={onFinished} />
       </Modal>
     </div>
   )

@@ -21,7 +21,7 @@ export const OptionPage = () => {
   useEffect(() => {
     const run = async() => {
       const data = await getAllStorageSyncData()
-      //const data = { OP_TYPE: 'rebase', TOKEN: '', USER_INFO: '{"login":"baiwusanyu-c", "avatar_url": "https://avatars.githubusercontent.com/u/32354856?v=4"}' }
+      // const data = { OP_TYPE: 'rebase', TOKEN: '', USER_INFO: '{"login":"baiwusanyu-c", "avatar_url": "https://avatars.githubusercontent.com/u/32354856?v=4"}' }
       if (!isEmptyObj(data)) {
         data.USER_INFO = JSON.parse(data.USER_INFO)
         setStoreData(data as Record<string, any>)
