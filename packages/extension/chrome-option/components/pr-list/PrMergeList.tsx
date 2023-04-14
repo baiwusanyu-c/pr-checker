@@ -26,23 +26,33 @@ export const PrMergeList = (props: PrListProps) => {
   }, [props.repoInfo, getPRsByRepo])
 
   const { message } = App.useApp()
-  async function mergePrList(token: string, repoName: string, numberArr: number[] | string[]) {
+  async function mergePrList(token: string, repoName: string, itemArr: DataType[]) {
+
     try {
-      if (props.isProUser) {
+      await Promise.all(createRunList(itemArr.length, async(i: number) => {
         const params = {
-          base: 'main', // 目标仓库分支
-          head: ['feature-branch-1', 'feature-branch-2'], // pr 分支名
-          commit_message: `【pr-checker】Merging pull requests: ${numberArr.map(v=> `#${v} `)}`,
+          commit_message: `【pr-checker】Merging pull requests: #${itemArr[i].number} pro: ${props.isProUser}`,
           merge_method: 'squash',
         }
-        await batchesMergePr(token, repoName)
+        await batchesMergePr(token, repoName, itemArr[i].number, params)
+      }))
+
+      /*if (props.isProUser) {
+        const params = {
+          base: itemArr[0].base, // 目标仓库分支
+          head: itemArr.map(v => v.head), // pr 分支名
+          commit_message: `【pr-checker】Merging pull requests: ${itemArr.map(v => `#${v.number} `)}`,
+          merge_method: 'squash',
+        }
+        debugger
+        await batchesMergePr(token, repoName, params)
       } else {
-        await Promise.all(createRunList(numberArr.length, async(i: number) => {
+        await Promise.all(createRunList(itemArr.length, async(i: number) => {
           console.log(i)
           // TODO add to merge queue
-          // TODO await rebasePr(token, repoName, numberArr[i])
+          // TODO await rebasePr(token, repoName, itemArr[i])
         }))
-      }
+      }*/
 
       message.open({
         type: 'success',
