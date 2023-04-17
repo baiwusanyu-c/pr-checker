@@ -2,7 +2,6 @@ import { Button, Input, Spin, Tooltip } from 'antd'
 import { getAllRepo, getIssuesPR } from '@pr-checker/fetchGit'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useThrottleFn } from 'ahooks'
-// TODO: logo data
 // TODO all select handle
 interface IRepoListProps {
   opType: string
@@ -25,10 +24,11 @@ export const RepoList = (props: IRepoListProps) => {
   const [repoList, setRepoList] = useState<IRepoWithPRs[]>([])
   const repoListCache = useRef<IRepoWithPRs[]>([])
   const [loading, setLoading] = useState(false)
+  const { token, userName, opType, onSelect } = props
   useEffect(() => {
-    setLoading(true)
-    if (props.opType === 'rebase') {
-      getIssuesPR(props.token, props.userName)
+    token && setLoading(true)
+    if (opType === 'rebase' && token) {
+      getIssuesPR(token, userName)
         .then((res) => {
           // 使用 map 避免重复遍历
           const repos = new Map<string, IRepoWithPRs>()
@@ -49,15 +49,15 @@ export const RepoList = (props: IRepoListProps) => {
           const resRepo = [...repos.values()]
           setRepoList(resRepo)
           repoListCache.current = resRepo
-          props.onSelect(resRepo[0])
+          onSelect(resRepo[0])
         })
         .finally(() => {
           setLoading(false)
         })
     }
     // merge 模式 我们只获取仓库信息
-    if (props.opType === 'merge') {
-      getAllRepo(props.token).then((res) => {
+    if (opType === 'merge' && token) {
+      getAllRepo(token).then((res) => {
         const hasIssuesRepo = res.filter(val => val.open_issues_count > 0 && !val.fork)
         const repos = new Map<string, IRepoWithPRs>()
         hasIssuesRepo.forEach((val) => {
@@ -70,22 +70,24 @@ export const RepoList = (props: IRepoListProps) => {
         const resRepo = [...repos.values()]
         setRepoList(resRepo)
         repoListCache.current = resRepo
-        props.onSelect(resRepo[0])
+        onSelect(resRepo[0])
       }).finally(() => {
         setLoading(false)
       })
     }
-  }, [props.opType, props.token, props.userName])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, userName, opType])
 
   const [activeIndex, setActiveIndex] = useState(0)
   const handleClick = useCallback((index: number) => {
     setActiveIndex(index)
-    props.onSelect(repoList[index])
+    onSelect(repoList[index])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repoList])
 
   const repoListEl = useMemo(() => {
     return repoList.map((repo, index) => (
-        <Tooltip title={repo.uname} key={repo.url}>
+        <Tooltip title={repo.uname} key={repo.url} placement="right">
           <li
               style={activeIndex === index ? { backgroundColor: '#cafcec', color: '#1cd2a9' } : {}}
               className="cursor-pointer flex items-center rounded-md list-none h-8 p2 hover:bg-mLight hover:text-main dark:text-white"
@@ -120,7 +122,7 @@ export const RepoList = (props: IRepoListProps) => {
     <div id="pr_checker_repo_list">
       <Search placeholder="Input repo name" className="mb-4 !dark:bg-gray-7" onChange={run} allowClear />
       <Button type="primary" className="mb-4 w-full" >
-        { `${props.opType} all`}
+        { `${props.opType || 'rebase'} all`}
       </Button>
       <ul className="list-none p-0 min-w-1 border-1"
           style={loading ? { display: 'flex', justifyContent: 'center' } : {}}

@@ -52,6 +52,3 @@ function getManifest() {
 export async function writeManifest() {
   await fs.writeJSON(outputDir, await getManifest(), { spaces: 2 })
 }
-
-// TODO: ext dev
-// TODO: rewrite path
