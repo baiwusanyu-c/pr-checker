@@ -36,9 +36,6 @@ export const PopupPage = () => {
       name: res.name,
     })
 
-    if (res.plan)
-      res.isPro = res.plan.name === 'pro'
-
     await setItem(CACHE_KEYS.USER_INFO, JSON.stringify(res))
   }
 

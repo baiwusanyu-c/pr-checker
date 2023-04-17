@@ -9,7 +9,6 @@ interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs
   token: string
-  isProUser: boolean
 }
 
 export const PrMergeList = (props: PrListProps) => {
@@ -27,33 +26,12 @@ export const PrMergeList = (props: PrListProps) => {
 
   const { message } = App.useApp()
   async function mergePrList(token: string, repoName: string, itemArr: DataType[]) {
-
     try {
       await Promise.all(createRunList(itemArr.length, async(i: number) => {
-        const params = {
-          commit_message: `【pr-checker】Merging pull requests: #${itemArr[i].number} pro: ${props.isProUser}`,
-          merge_method: 'squash',
-        }
+        // TODO: merge queue 没有 api，我们只能轮训了
+        // TODO: 查询组织仓库？
         await batchesMergePr(token, repoName, itemArr[i].number, params)
       }))
-
-      /*if (props.isProUser) {
-        const params = {
-          base: itemArr[0].base, // 目标仓库分支
-          head: itemArr.map(v => v.head), // pr 分支名
-          commit_message: `【pr-checker】Merging pull requests: ${itemArr.map(v => `#${v.number} `)}`,
-          merge_method: 'squash',
-        }
-        debugger
-        await batchesMergePr(token, repoName, params)
-      } else {
-        await Promise.all(createRunList(itemArr.length, async(i: number) => {
-          console.log(i)
-          // TODO add to merge queue
-          // TODO await rebasePr(token, repoName, itemArr[i])
-        }))
-      }*/
-
       message.open({
         type: 'success',
         content: `${props.opType} success`,

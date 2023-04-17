@@ -121,7 +121,7 @@ export const PrList = (props: PrListProps) => {
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            await props.updatePr(props.token, item.repoName, [item.number])
+            await props.updatePr(props.token, item.repoName, [item])
             setLoading(true)
             handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
             setSelectedRowKeys([]) // 清空选中状态
