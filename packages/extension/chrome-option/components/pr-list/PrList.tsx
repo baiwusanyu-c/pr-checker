@@ -14,10 +14,10 @@ interface PrListProps {
   repoInfo: IRepoWithPRs
   token: string
   disablePolicy: (flag: opFlag) => boolean
-  updatePr: (token: string, repoName: string, numberArr: number[] | string[]) => void
+  updatePr: (token: string, repoName: string, numberArr: DataType[]) => void
 }
 
-interface DataType {
+export interface DataType {
   number: string
   title: string
   repoName: string
@@ -26,6 +26,8 @@ interface DataType {
   html_url: string
   author: string
   id: number
+  head: string
+  base: string
 }
 
 export const PrList = (props: PrListProps) => {
@@ -72,6 +74,8 @@ export const PrList = (props: PrListProps) => {
           html_url: prl[i].html_url,
           opFlag: 0,
           id: prl[i].id,
+          base: prl[i].base ? prl[i].base.ref : '',
+          head: prl[i].base ? prl[i].head.ref : '',
         }
         // get pr detail data
         try {
@@ -129,12 +133,12 @@ export const PrList = (props: PrListProps) => {
     })
   }
 
-  const [selectedNumberData, setSelectedNumberData] = useState([])
+  const [selectedItemData, setSelectedItemData] = useState([])
   const rowSelection = {
     selectedRowKeys,
     onChange: (keys: React.Key[], selectedRows: DataType[]) => {
       console.log(selectedRows)
-      setSelectedNumberData(selectedRows.map(v => v.number))
+      setSelectedItemData(selectedRows)
       setSelectedRowKeys(keys)
     },
     getCheckboxProps: (record: DataType) => ({
@@ -143,7 +147,7 @@ export const PrList = (props: PrListProps) => {
   }
 
   const handleOpAll = async() => {
-    if (selectedNumberData.length === 0) {
+    if (selectedItemData.length === 0) {
       message.open({
         type: 'warning',
         content: 'Select the row you want to work on',
@@ -161,7 +165,7 @@ export const PrList = (props: PrListProps) => {
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            await props.updatePr(props.token, props.repoInfo.uname, selectedNumberData)
+            await props.updatePr(props.token, props.repoInfo.uname, selectedItemData)
             setLoading(true)
             handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
             setSelectedRowKeys([]) // 清空选中状态
