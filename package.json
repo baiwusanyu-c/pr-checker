@@ -100,7 +100,7 @@
     "rollup-plugin-typescript2": "^0.34.1",
     "simple-git-hooks": "^2.8.1",
     "tsup": "^6.5.0",
-    "typescript": "5.0.3",
+    "typescript": "5.0.4",
     "vitest": "^0.29.8"
   },
   "simple-git-hooks": {
