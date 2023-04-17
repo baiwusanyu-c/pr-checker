@@ -74,8 +74,8 @@ export const PrList = (props: PrListProps) => {
           html_url: prl[i].html_url,
           opFlag: 0,
           id: prl[i].id,
-          base: prl[i].base.ref,
-          head: prl[i].head.ref,
+          base: prl[i].base ? prl[i].base.ref : '',
+          head: prl[i].base ? prl[i].head.ref : '',
         }
         // get pr detail data
         try {
