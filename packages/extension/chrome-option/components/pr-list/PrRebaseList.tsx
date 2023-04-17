@@ -1,9 +1,9 @@
 import { createRunList } from '@pr-checker/utils/common'
 import { rebasePr } from '@pr-checker/fetchGit'
 import { App } from 'antd'
-import { PrList } from './Pr-List'
-import type { IRepoWithPRs } from '../Repo-List'
-import type { opFlag } from './Pr-List'
+import { PrList } from './PrList'
+import type { IRepoWithPRs } from '../RepoList'
+import type { DataType, opFlag } from './PrList'
 interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs
@@ -19,10 +19,10 @@ export const PrRebaseList = (props: PrListProps) => {
   async function rebasePrList(
     token: string,
     repoName: string,
-    numberArr: number[] | string[]) {
+    itemArr: DataType[]) {
     try {
-      await Promise.all(createRunList(numberArr.length, async(i: number) => {
-        await rebasePr(token, repoName, numberArr[i])
+      await Promise.all(createRunList(itemArr.length, async(i: number) => {
+        await rebasePr(token, repoName, itemArr[i].number)
       }))
       message.open({
         type: 'success',

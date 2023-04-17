@@ -1,11 +1,11 @@
 import { App, Button, Input, Space, Table, Tag, Tooltip } from 'antd'
 import { ExclamationCircleFilled, ReloadOutlined } from '@ant-design/icons'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createRunList } from '@pr-checker/utils/common'
 import { compareBranch, getPRDetail } from '@pr-checker/fetchGit'
 import { useSearch } from '../../../hooks/use-search'
 import type React from 'react'
-import type { IRepoWithPRs } from '../Repo-List'
+import type { IRepoWithPRs } from '../RepoList'
 import type { ColumnsType } from 'antd/es/table'
 
 export declare type opFlag = 0 | 1 | 2 | 3
@@ -14,10 +14,10 @@ interface PrListProps {
   repoInfo: IRepoWithPRs
   token: string
   disablePolicy: (flag: opFlag) => boolean
-  updatePr: (token: string, repoName: string, numberArr: number[] | string[]) => void
+  updatePr: (token: string, repoName: string, numberArr: DataType[]) => void
 }
 
-interface DataType {
+export interface DataType {
   number: string
   title: string
   repoName: string
@@ -26,49 +26,16 @@ interface DataType {
   html_url: string
   author: string
   id: number
+  head: string
+  base: string
 }
 
 export const PrList = (props: PrListProps) => {
-  const [tableData, setTableData] = useState<DataType[] >([])
+  const [tableData, setTableData] = useState<DataType[]>(() => [])
   const tableDataCache = useRef<DataType[]>([])
   const [loading, setLoading] = useState(false)
-  useEffect(() => {
-    setLoading(true)
-    setTableData([])
-    if (props.repoInfo.pullRequests.length > 0)
-      handleTableData(props.repoInfo.pullRequests)
-    else
-      setTimeout(() => setLoading(false), 300)
-  }, [props.repoInfo])
 
-  async function handleTableData(prl: Record<any, any>[]) {
-    setTableData([])
-    if (prl && prl.length === 0) {
-      setLoading(false)
-      return
-    }
-
-    const res = await Promise.all(createRunList(prl.length, async(i: number) => {
-      const repo = props.repoInfo.uname
-      let res = {
-        number: prl[i].number,
-        title: prl[i].title,
-        repoName: repo,
-        state: 'no update',
-        html_url: prl[i].html_url,
-        opFlag: 0,
-        id: prl[i].id,
-      }
-      // get pr detail data
-      res = await compareBranchToUpdate(prl[i].number, repo, res as DataType)
-      return res
-    }))
-    setTableData(res as DataType[])
-    setLoading(false)
-    tableDataCache.current = res
-  }
-
-  async function compareBranchToUpdate(number: number, repo: string, res: DataType) {
+  const compareBranchToUpdate = useCallback(async(number: number, repo: string, res: DataType) => {
     const prInfo = await getPRDetail(props.token, repo, number)
     res.author = prInfo.user.login
     if (prInfo.mergeable_state === 'dirty') {
@@ -88,7 +55,53 @@ export const PrList = (props: PrListProps) => {
       }
     }
     return res
-  }
+  }, [props.token, props.opType])
+
+  const handleTableData = useCallback(async(prl: Record<any, any>[], uname) => {
+    setTableData([])
+    if (!prl || prl.length === 0) {
+      setLoading(false)
+      return
+    }
+
+    try {
+      const res = await Promise.all(createRunList(prl.length, async(i: number) => {
+        let res = {
+          number: prl[i].number,
+          title: prl[i].title,
+          repoName: uname,
+          state: 'no update',
+          html_url: prl[i].html_url,
+          opFlag: 0,
+          id: prl[i].id,
+          base: prl[i].base ? prl[i].base.ref : '',
+          head: prl[i].base ? prl[i].head.ref : '',
+        }
+        // get pr detail data
+        try {
+          res = await compareBranchToUpdate(prl[i].number, uname, res as DataType)
+        } catch (error) {
+          console.error(error)
+        }
+        return res
+      }))
+      setTableData(res as DataType[])
+      tableDataCache.current = res
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }, [compareBranchToUpdate])
+
+  useEffect(() => {
+    setLoading(true)
+    setTableData([])
+    if (props.repoInfo.pullRequests.length > 0)
+      handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
+    else
+      setTimeout(() => setLoading(false), 300)
+  }, [props.repoInfo.uname, props.repoInfo.pullRequests, handleTableData])
 
   const { search } = useSearch(tableDataCache, setTableData)
 
@@ -108,10 +121,9 @@ export const PrList = (props: PrListProps) => {
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            // TODO
             await props.updatePr(props.token, item.repoName, [item.number])
             setLoading(true)
-            handleTableData(props.repoInfo.pullRequests)
+            handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
             setSelectedRowKeys([]) // 清空选中状态
             resolve(true)
           }
@@ -121,11 +133,12 @@ export const PrList = (props: PrListProps) => {
     })
   }
 
-  let selectedNumberData: string[] = []
+  const [selectedItemData, setSelectedItemData] = useState([])
   const rowSelection = {
     selectedRowKeys,
     onChange: (keys: React.Key[], selectedRows: DataType[]) => {
-      selectedNumberData = selectedRows.map(v => v.number)
+      console.log(selectedRows)
+      setSelectedItemData(selectedRows)
       setSelectedRowKeys(keys)
     },
     getCheckboxProps: (record: DataType) => ({
@@ -134,7 +147,7 @@ export const PrList = (props: PrListProps) => {
   }
 
   const handleOpAll = async() => {
-    if (selectedNumberData.length === 0) {
+    if (selectedItemData.length === 0) {
       message.open({
         type: 'warning',
         content: 'Select the row you want to work on',
@@ -152,9 +165,9 @@ export const PrList = (props: PrListProps) => {
       onOk() {
         return new Promise((resolve) => {
           const run = async() => {
-            await props.updatePr(props.token, props.repoInfo.uname, selectedNumberData)
+            await props.updatePr(props.token, props.repoInfo.uname, selectedItemData)
             setLoading(true)
-            handleTableData(props.repoInfo.pullRequests)
+            handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
             setSelectedRowKeys([]) // 清空选中状态
             resolve(true)
           }
@@ -166,7 +179,7 @@ export const PrList = (props: PrListProps) => {
 
   const reload = () => {
     setLoading(true)
-    handleTableData(props.repoInfo.pullRequests)
+    handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
   }
   const columns: ColumnsType<DataType> = [
     {
@@ -255,7 +268,7 @@ export const PrList = (props: PrListProps) => {
         />
 
         <Button type="primary" className="mx-4 flex-1" onClick={handleOpAll}>
-          { `${props.opType} all`}
+          { `${props.opType || 'rebase'} all`}
         </Button>
 
         <Tooltip title="reload">

@@ -1,4 +1,20 @@
 .login {
   background-repeat: no-repeat;
   background-size: cover;
+  background-image: url("../../assets/img/login-bg.png");
+}
+
+
+.login-modal .ant-modal-content{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("../../assets/img/login-bg.png");
+}
+
+.login-modal .ant-modal-header{
+  background-color: transparent;
+}
+
+.dark .login-modal .ant-modal-content{
+  background-blend-mode: overlay;
 }
