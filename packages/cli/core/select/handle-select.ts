@@ -1,10 +1,9 @@
 
 import ora from 'ora'
-import { GitApi, createRunList, isEmptyObj, log } from '@pr-checker/utils'
+import { GitApi, createRunList, isEmptyObj, log, logType } from '@pr-checker/utils'
 import { Table } from 'console-table-printer'
-import chalk from 'chalk'
 import { createPrOption, createRepoOption, promptsRun, typeOption } from './select-configure'
-import type { IPRCheckRes, IPRInfo, IPRListItem } from '@pr-checker/utils'
+import type { IPRCheckRes, IPRListItem } from '@pr-checker/utils'
 import type { Storage } from '../store/storage'
 declare type IPRSelect = Record<string, IPRCheckRes[]>
 
@@ -15,7 +14,7 @@ export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
   let updateRes = []
   const spinner = ora({ text: 'Loading Repo......', color: 'blue' }).start()
   const githubApi = new GitApi(store.token, store.username!)
-  const prList = mode === 'rebase' ? (await githubApi.getSubmitPRList()) : (await githubApi.getAllRepoPRList())
+  const prList = mode === 'rebase' ? (await githubApi.getIssuesPRCLI()) : (await githubApi.getAllRepoPRList())
   spinner.stop()
   const repoList = Object.keys(prList)
 
@@ -28,7 +27,7 @@ export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
     log('info', `Checking PR by ${selectRepo.RepoSelect}......`)
     const prListByRepo = await checkPR(prl, githubApi, mode)
     // select pr
-    const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
+    const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[], mode))
     // update pr
     log('info', `Update PR by ${selectRepo.RepoSelect}......`)
     updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi, mode)
@@ -43,7 +42,7 @@ export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
     log('info', 'Checking PR......')
     const prListByRepo = await checkPR(prl, githubApi, mode)
     // select pr
-    const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[]))
+    const prSelectRes = await promptsRun(createPrOption(prListByRepo as IPRCheckRes[], mode))
     // update pr
     log('info', 'Update PR......')
     updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi, mode)
@@ -54,20 +53,62 @@ export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
   await printUpdateRes(updateRes as IPRCheckRes[])
 }
 
-async function checkPR(prl: IPRListItem[], githubApi: GitApi, mode: 'merge' | 'rebase') {
+const compareBranchToUpdate = async(
+  number: number,
+  repo: string,
+  res,
+  githubApi: GitApi,
+  mode: 'merge' | 'rebase',
+) => {
+  const prInfo = await githubApi.getPRDetailCLI(repo, number)
+  res.author = prInfo.user.login
+  if (prInfo.mergeable_state === 'dirty') {
+    res.state = 'code conflict'
+    res.opFlag = 1
+  } else if (prInfo.mergeable_state === 'unstable') {
+    res.state = 'unstable'
+    res.opFlag = 3
+  } else {
+    const basehead = `${prInfo.base.ref}...${prInfo.head.label}`
+    const onwer = repo.split('/')[0]
+    const repoName = repo.split('/')[1]
+    // need update pr ?
+    const compareRes = await githubApi.compareBranchCLI(basehead, repoName, onwer)
+    if (prInfo.mergeable_state === 'clean' && (compareRes.behind_by > 0)) {
+      res.state = `can ${mode}`
+      res.opFlag = 2
+    }
+  }
+  return res
+}
+
+async function checkPR(
+  prl,
+  githubApi: GitApi,
+  mode: 'merge' | 'rebase') {
   if (prl.length === 0) {
     log('error', 'Please select a pr to check')
     process.exit()
   }
+
   const prListByRepo = await Promise.all(createRunList(prl.length, async(i: number) => {
-    // get pr detail data
-    const prInfo = await githubApi.getPRByRepo(prl[i].number, prl[i].repo, prl[i].title)
-    // need update pr ?
-    const res = await githubApi.needUpdate(prl[i].repo, prInfo as IPRInfo, mode)
-    log('success', `✔ Check PR #${prl[i].number} completed`)
-    return {
-      ...prInfo,
-      ...res,
+    try {
+      let res = {
+        number: prl[i].number,
+        title: prl[i].title,
+        repoName: prl[i].repo,
+        state: 'no update',
+        html_url: prl[i].html_url,
+        opFlag: 0,
+        id: prl[i].id,
+        base: prl[i].base ? prl[i].base.ref : '',
+        head: prl[i].head ? prl[i].head.ref : '',
+      }
+      res = await compareBranchToUpdate(prl[i].number, prl[i].repo, res, githubApi, mode)
+      log('success', `✔ Check PR #${prl[i].number} completed`)
+      return res
+    } catch (error) {
+      console.error(error)
     }
   }))
   return prListByRepo
@@ -79,10 +120,11 @@ async function updatePR(
   githubApi: GitApi,
   mode: 'merge' | 'rebase') {
   const updateRes = await Promise.all(createRunList(prl.length, async(i: number) => {
-    if (prSelectRes.prSelect[i] && prSelectRes.prSelect[i].isNeedUpdate) {
+    if (prSelectRes.prSelect[i] && prSelectRes.prSelect[i].canOp) {
       if (mode === 'rebase')
-        await githubApi.rebasePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+        await githubApi.rebasePrCLI(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
 
+      // TODO 使用队列更新
       if (mode === 'merge')
         await githubApi.mergePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
 
@@ -95,7 +137,7 @@ async function updatePR(
   return updateRes
 }
 
-async function printUpdateRes(res: IPRCheckRes[]) {
+async function printUpdateRes(res) {
   const p = new Table({
     columns: [
       { name: 'number', alignment: 'left' },
@@ -106,17 +148,17 @@ async function printUpdateRes(res: IPRCheckRes[]) {
       { name: 'title', alignment: 'left' },
     ],
   })
-  res.sort((a, b) => Number(a.isNeedUpdate) - Number(b.isNeedUpdate))
+  res.sort((a, b) => Number(a.canOp) - Number(b.canOp))
   res.forEach((item) => {
     if (!isEmptyObj(item)) {
       p.addRow({
-        'number': chalk.greenBright.bold(`#${item.number}`),
-        'can merge': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
-        'success': item.isNeedUpdate ? chalk.greenBright.bold('true') : chalk.redBright.bold('false'),
-        'reason': item.isNeedUpdate
-          ? chalk.blueBright.bold('-')
-          : item.reason === 'not updated' ? chalk.blueBright.bold(item.reason) : chalk.yellowBright.bold(item.reason),
-        'repo': chalk.blueBright.bold(`<${item.repo}>`),
+        'number': logType.success('', `#${item.number}`),
+        'can merge': item.canOp ? logType.success('', 'true') : logType.error('', 'false'),
+        'success': item.canOp ? logType.success('', 'true') : logType.error('', 'false'),
+        'reason': item.canOp
+          ? logType.info('', '-')
+          : item.reason === 'not updated' ? logType.info('', item.reason) : logType.warning('', item.reason),
+        'repo': logType.info('', `<${item.repo}>`),
         'title': item.title,
       })
     }

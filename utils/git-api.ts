@@ -40,7 +40,7 @@ export class GitApi {
    * 获取账户下所有提交 pr
    * @param username
    */
-  async getSubmitPRList(username: string = this.owner) {
+  async getIssuesPRCLI(username: string = this.owner) {
     try {
       const { data } = await this.octokit.request('GET /search/issues', {
         q: `is:pr is:open author:${username}`,
@@ -54,10 +54,8 @@ export class GitApi {
         const repo = val.repository_url.split('repos/')[1]
         if (!res[repo]) res[repo] = []
         res[repo].push({
-          title: val.title,
-          number: val.number,
           repo,
-          id: val.id,
+          ...val,
         })
       })
       return res
@@ -116,9 +114,8 @@ export class GitApi {
    * Get pr details according to pr number and repo name
    * @param pull_number pr 号
    * @param repo_name upstream Repo name
-   * @param title
    */
-  async getPRByRepo(pull_number: number, repo_name: string, title?: string) {
+  async getPRDetailCLI(repo_name: string, pull_number: string | number) {
     try {
       const { data } = await this.octokit.request(
         `GET /repos/${repo_name}/pulls/{pull_number}`,
@@ -127,59 +124,28 @@ export class GitApi {
         },
       )
 
-      return {
-        sha: data.base.sha, // Fork warehouse default branch hash
-        org_repo: data.base.repo.full_name,
-        org_repo_default_branch: data.base.repo.default_branch,
-        pr_sha: data.head.sha,
-        pr_repo: data.head.repo.default_branch,
-        pr_repo_default_branch: data.head.repo.default_branch,
-        merged: data.merged,
-        mergeable: data.mergeable,
-        mergeable_state: data.mergeable_state,
-        number: pull_number,
-        repo: repo_name,
-        title: title || '',
-      } as IPRInfo
+      return data
     } catch (error: any) {
       log('error', error)
       return {}
     }
   }
 
-  /**
-   * Determine whether pr wants to synchronize the upstream Repo
-   * @param repo_name upstream Repo name
-   * @param pr_info The getPRByRepo function returns the result
-   * @param mode
-   */
-  async needUpdate(repo_name: string, pr_info: IPRInfo, mode: 'rebase' | 'merge') {
-    // TODO refactor
+  async compareBranchCLI(basehead: string, repo: string, owner: string) {
     try {
-      if (pr_info.mergeable_state === 'dirty')
-        return { isNeedUpdate: false, reason: 'code conflict' }
-
       const { data } = await this.octokit.request(
-        `GET /repos/${repo_name}/commits`,
+        'GET /repos/{owner}/{repo}/compare/{basehead}',
+        {
+          basehead,
+          repo,
+          owner,
+        },
       )
 
-      if (data.length >= 0) {
-        // Comparison of the default branch hash of
-        // the fork warehouse and the upstream warehouse hash
-        const cur_sha = data[0].sha
-        const matchedSha = (mode === 'rebase' && pr_info.sha !== cur_sha) || mode === 'merge'
-        if (matchedSha
-          && pr_info.mergeable
-          && !pr_info.merged)
-          return { isNeedUpdate: true, reason: '--' }
-        else
-          return { isNeedUpdate: false, reason: 'not updated' }
-      } else {
-        return { isNeedUpdate: false, reason: 'unknown error' }
-      }
+      return data
     } catch (error: any) {
       log('error', error)
-      return { isNeedUpdate: false, reason: 'unknown error' }
+      return {}
     }
   }
 
@@ -188,7 +154,7 @@ export class GitApi {
    * @param pull_number
    * @param repo_name
    */
-  async rebasePR(pull_number: number, repo_name: string) {
+  async rebasePrCLI(pull_number: number, repo_name: string) {
     try {
       const res = await this.octokit.request(
         `PUT /repos/${repo_name}/pulls/{pull_number}/update-branch`,

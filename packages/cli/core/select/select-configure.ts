@@ -1,7 +1,7 @@
-import chalk from 'chalk'
-import { formatEllipsis, log } from '@pr-checker/utils'
+
+import { formatEllipsis, log, logType } from '@pr-checker/utils'
 import prompts from 'prompts'
-import type { IPRCheckRes } from '@pr-checker/utils'
+import type { opFlag } from '@pr-checker/extension/chrome-option/components/pr-list/PrList'
 import type * as promptsType from 'prompts'
 export const typeOption = [{
   type: 'select',
@@ -27,22 +27,31 @@ export const createRepoOption = (list: string[]) => {
   }] as promptsType.PromptObject[]
 }
 
-export const createPrOption = (list: IPRCheckRes[]) => {
-  const handler = (item: IPRCheckRes) => {
-    const repo = chalk.blueBright.bold(`[${formatEllipsis(item.repo)}]`)
-    const number = chalk.yellowBright.bold(`[#${item.number}]`)
+export const createPrOption = (list, mode) => {
+  const handler = (item) => {
+    const repo = logType.info('', `[${formatEllipsis(item.repoName)}]`)
+    const number = logType.warning('', `[#${item.number}]`)
     const title = formatEllipsis(`${item.title}`, 36)
-    const canMerge = item.isNeedUpdate
-      ? chalk.yellowBright.bold('<can merge>') : chalk.redBright.bold(`<can\`t merge:${item.reason}>`)
-    const infoTitle = `${canMerge}: ${repo}-${number} -> ${title}`
+
+    const disablePolicy = (flag: opFlag, mode) => {
+      if (mode === 'merge')
+        return !(flag === 2 || flag === 0)
+      else
+        return flag !== 2
+    }
+    const op = !disablePolicy(item.opFlag, mode)
+      ? logType.warning('', '\'<can merge>\'')
+      : logType.error('', `<can\`t merge:${item.state}>`)
+
+    const infoTitle = `${op}: ${repo}-${number} -> ${title}`
     return {
       title: infoTitle,
       value: {
         title: item.title,
         number: item.number,
-        repo: item.repo,
-        isNeedUpdate: item.isNeedUpdate,
-        reason: item.reason,
+        repo: item.repoName,
+        canOp: !disablePolicy(item.opFlag, mode),
+        reason: item.state,
         infoTitle,
       },
     }
