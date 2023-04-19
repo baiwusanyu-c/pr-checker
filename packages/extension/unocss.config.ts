@@ -29,6 +29,9 @@ export default defineConfig({
     }),
     presetTypography(),
   ],
+  rules: [
+    ['over-y', { 'overflow-y': 'auto' }],
+  ],
   transformers: [
     transformerDirectives(),
     transformerVariantGroup(),

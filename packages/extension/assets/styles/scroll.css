@@ -1,0 +1,70 @@
+/* WebKit浏览器滚动条整体样式 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: transparent;
+}
+
+/* WebKit浏览器滚动条滑块样式 */
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #3ccaa4;
+}
+
+/* 其他浏览器滚动条整体样式 */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #3ccaa4 transparent;
+}
+
+/* 其他浏览器滚动条滑块样式 */
+*::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #3ccaa4;
+}
+
+/* IE11滚动条样式 */
+* {
+    -ms-overflow-style: none;
+}
+
+/* Firefox滚动条样式 */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #3ccaa4 transparent;
+}
+
+*::-moz-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #3ccaa4;
+}
+
+/* Safari滚动条样式 */
+*::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+/* 滚动条hover状态下样式 */
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #1b8e7f;
+}
+
+/* 滚动条拖动状态下样式 */
+*::-webkit-scrollbar-thumb:active {
+    background-color: #006d5b;
+}
+
+/* 滚动条聚焦状态下样式 */
+*::-webkit-scrollbar-thumb:focus {
+    outline: 1px solid #3ccaa4;
+}
+
+/* 滚动条轨道样式 */
+*::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* 滚动条轨道hover状态下样式 */
+*::-webkit-scrollbar-track:hover {
+    background-color: rgba(60, 202, 164, 0.3);
+}

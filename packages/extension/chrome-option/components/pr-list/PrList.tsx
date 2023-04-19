@@ -37,7 +37,6 @@ export const PrList = (props: PrListProps) => {
 
   const compareBranchToUpdate = useCallback(
     async(number: number, repo: string, res: DataType) => {
-      // TODO：或许可以更换接口？
       const prInfo = await getPRDetail(props.token, repo, number)
       res.author = prInfo.user.login
       if (prInfo.mergeable_state === 'dirty') {
@@ -99,11 +98,10 @@ export const PrList = (props: PrListProps) => {
   useEffect(() => {
     setLoading(true)
     setTableData([])
-    if (props.repoInfo.pullRequests.length > 0) {
+    if (props.repoInfo.pullRequests.length > 0)
       handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
-    } else {
+    else
       setTimeout(() => setLoading(false), 300)
-    }
   }, [props.repoInfo.uname, props.repoInfo.pullRequests, handleTableData])
 
   const { search } = useSearch(tableDataCache, setTableData)

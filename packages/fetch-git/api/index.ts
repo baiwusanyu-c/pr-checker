@@ -23,20 +23,34 @@ export async function getIssuesPR(token: string, username: string) {
 }
 
 export async function getAllRepo(token: string) {
-  /* const res = await request(`${baseUrl}/user/repos`, {
+  const res = await request(`${baseUrl}/user/repos`, {
     method: 'GET',
     token,
     params: {
       type: 'owner',
       per_page: 1000,
     },
-  }) */
-  // TODO 组织？
-  const res = await request(`${baseUrl}/orgs/Be-UI/repos`, {
+  })
+  return res
+}
+
+export async function getOrgsInfo(token: string) {
+  const res = await request(`${baseUrl}/user/orgs`, {
     method: 'GET',
     token,
     params: {
-      // q: `is:pr is:open author:${username}`,
+      type: 'owner',
+      per_page: 1000,
+    },
+  })
+  return res
+}
+
+export async function getAllOrgsRepo(token: string, orgName: string) {
+  const res = await request(`${baseUrl}/orgs/${orgName}/repos`, {
+    method: 'GET',
+    token,
+    params: {
       per_page: 1000,
     },
   })
