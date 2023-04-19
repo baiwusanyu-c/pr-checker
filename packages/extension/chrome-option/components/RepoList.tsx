@@ -49,7 +49,7 @@ export const RepoList = (props: IRepoListProps) => {
           const resRepo = [...repos.values()]
           setRepoList(resRepo)
           repoListCache.current = resRepo
-          onSelect(resRepo[0])
+          resRepo.length > 0 && onSelect(resRepo[0])
         })
         .finally(() => {
           setLoading(false)
@@ -70,7 +70,7 @@ export const RepoList = (props: IRepoListProps) => {
         const resRepo = [...repos.values()]
         setRepoList(resRepo)
         repoListCache.current = resRepo
-        onSelect(resRepo[0])
+        resRepo.length > 0 && onSelect(resRepo[0])
       }).finally(() => {
         setLoading(false)
       })

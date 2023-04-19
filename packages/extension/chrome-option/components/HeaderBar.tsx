@@ -73,7 +73,7 @@ export const HeaderBar = (props: HeaderBarProps = {
         <a href={props.userInfo.html_url} target="_blank" rel="noreferrer" title={props.userInfo.html_url}>
           <Avatar size={46} src={props.userInfo.avatar_url} icon={<UserOutlined />} />
         </a>
-        <h1 className="mx-4 my-0 text-gray-600 text-xl dark:text-white">{props.repoInfo.uname}</h1>
+        <h1 className="mx-4 my-0 text-gray-600 text-xl dark:text-white">{props.repoInfo.uname || ''}</h1>
       </div>
       <div className="flex items-center">
         <a
