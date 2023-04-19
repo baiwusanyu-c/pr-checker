@@ -29,3 +29,46 @@ export function formatEllipsis(str = '', limitLen = 24) {
   })
   return inx === -1 ? str : `${str.substr(0, inx)}...`
 }
+
+export interface ITask {
+  fn: () => void
+  params: Array<any>
+  retry: number
+  id: number
+}
+export function runTaskQueue(
+  taskQueue: Array<ITask>,
+  hook: {
+    onAllSuccess: () => void
+  },
+  maxRetry = 5) {
+  const MAX_RETRY = maxRetry
+  async function processTask(task) {
+    try {
+      await task.fn(...task.params)
+      console.log(`Task ${task.id} completed successfully`)
+    } catch (error) {
+      console.error(`Error processing task ${task.id}:`, error.message)
+      task.retry++ // 增加重试次数
+      if (task.retry < MAX_RETRY) {
+        taskQueue.push(task) // 重试次数未达到最大值，将任务重新放入队列尾部
+        console.log(`Task ${task.id} will be retried later`)
+      } else {
+        console.log(`Task ${task.id} has reached the maximum number of retries and will not be retried again`)
+      }
+    }
+  }
+  async function processTaskQueue() {
+    while (taskQueue.length > 0) {
+      const task = taskQueue.shift() // 取出队列头部的任务
+      await processTask(task)
+    }
+  }
+
+  processTaskQueue().then(() => {
+    console.log('All tasks have been processed')
+    hook.onAllSuccess()
+  }).catch((error) => {
+    console.error('Error processing tasks:', error.message)
+  })
+}

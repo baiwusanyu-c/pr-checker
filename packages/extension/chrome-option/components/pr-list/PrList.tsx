@@ -35,27 +35,29 @@ export const PrList = (props: PrListProps) => {
   const tableDataCache = useRef<DataType[]>([])
   const [loading, setLoading] = useState(false)
 
-  const compareBranchToUpdate = useCallback(async(number: number, repo: string, res: DataType) => {
-    const prInfo = await getPRDetail(props.token, repo, number)
-    res.author = prInfo.user.login
-    if (prInfo.mergeable_state === 'dirty') {
-      res.state = 'code conflict'
-      res.opFlag = 1
-    } else if (prInfo.mergeable_state === 'unstable') {
-      res.state = 'pending'
-      res.opFlag = 3
-    } else {
-      let url = prInfo.base.repo.compare_url
-      url = url.replace('{base}', prInfo.base.ref).replace('{head}', prInfo.head.label)
-      // need update pr ?
-      const compareRes = await compareBranch(props.token, url)
-      if (prInfo.mergeable_state === 'clean' && (compareRes.behind_by > 0)) {
-        res.state = `can ${props.opType}`
-        res.opFlag = 2
+  const compareBranchToUpdate = useCallback(
+    async(number: number, repo: string, res: DataType) => {
+      // TODO：或许可以更换接口？
+      const prInfo = await getPRDetail(props.token, repo, number)
+      res.author = prInfo.user.login
+      if (prInfo.mergeable_state === 'dirty') {
+        res.state = 'code conflict'
+        res.opFlag = 1
+      } else if (prInfo.mergeable_state === 'unstable') {
+        res.state = 'unstable'
+        res.opFlag = 3
+      } else {
+        let url = prInfo.base.repo.compare_url
+        url = url.replace('{base}', prInfo.base.ref).replace('{head}', prInfo.head.label)
+        // need update pr ?
+        const compareRes = await compareBranch(props.token, url)
+        if (prInfo.mergeable_state === 'clean' && (compareRes.behind_by > 0)) {
+          res.state = `can ${props.opType}`
+          res.opFlag = 2
+        }
       }
-    }
-    return res
-  }, [props.token, props.opType])
+      return res
+    }, [props.token, props.opType])
 
   const handleTableData = useCallback(async(prl: Record<any, any>[], uname) => {
     setTableData([])
@@ -97,10 +99,11 @@ export const PrList = (props: PrListProps) => {
   useEffect(() => {
     setLoading(true)
     setTableData([])
-    if (props.repoInfo.pullRequests.length > 0)
+    if (props.repoInfo.pullRequests.length > 0) {
       handleTableData(props.repoInfo.pullRequests, props.repoInfo.uname)
-    else
+    } else {
       setTimeout(() => setLoading(false), 300)
+    }
   }, [props.repoInfo.uname, props.repoInfo.pullRequests, handleTableData])
 
   const { search } = useSearch(tableDataCache, setTableData)

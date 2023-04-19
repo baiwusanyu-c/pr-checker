@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { createRunList } from '@pr-checker/utils/common'
+import { runTaskQueue } from '@pr-checker/utils/common'
 import { batchesMergePr, getPRs } from '@pr-checker/fetchGit'
 import { App } from 'antd'
 import { PrList } from './PrList'
-import type { opFlag } from './PrList'
+import type { DataType, opFlag } from './PrList'
 import type { IRepoWithPRs } from '../RepoList'
 interface PrListProps {
   opType: string
@@ -27,14 +27,26 @@ export const PrMergeList = (props: PrListProps) => {
   const { message } = App.useApp()
   async function mergePrList(token: string, repoName: string, itemArr: DataType[]) {
     try {
-      await Promise.all(createRunList(itemArr.length, async(i: number) => {
-        // TODO: merge queue 没有 api，我们只能轮训了
-        // TODO: 查询组织仓库？
-        await batchesMergePr(token, repoName, itemArr[i].number, params)
-      }))
-      message.open({
-        type: 'success',
-        content: `${props.opType} success`,
+      const taskList = []
+      for (let i = 0; i < itemArr.length; i++) {
+        const params = {
+          commit_message: `【pr-checker】Merging pull requests: #${itemArr[i].number}`,
+          merge_method: 'squash',
+        }
+        taskList.push({
+          fn: batchesMergePr,
+          params: [token, repoName, itemArr[i].number, params],
+          retry: 0,
+          id: itemArr[i].number,
+        })
+      }
+      await runTaskQueue(taskList, {
+        onAllSuccess: () => {
+          message.open({
+            type: 'success',
+            content: `${props.opType} success`,
+          })
+        },
       })
     } catch (e) {
       console.error(e)

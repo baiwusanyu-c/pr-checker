@@ -23,14 +23,15 @@ export async function getIssuesPR(token: string, username: string) {
 }
 
 export async function getAllRepo(token: string) {
-  /*const res = await request(`${baseUrl}/user/repos`, {
+  /* const res = await request(`${baseUrl}/user/repos`, {
     method: 'GET',
     token,
     params: {
       type: 'owner',
       per_page: 1000,
     },
-  })*/
+  }) */
+  // TODO 组织？
   const res = await request(`${baseUrl}/orgs/Be-UI/repos`, {
     method: 'GET',
     token,
