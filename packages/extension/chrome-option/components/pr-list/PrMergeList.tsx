@@ -40,6 +40,7 @@ export const PrMergeList = (props: PrListProps) => {
           id: itemArr[i].number,
         })
       }
+      // TODO 收集失败和成功信息
       await runTaskQueue(taskList, {
         onAllSuccess: () => {
           message.open({
