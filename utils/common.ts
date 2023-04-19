@@ -36,9 +36,9 @@ export interface ITask {
   retry: number
   id: number
 }
-export function runTaskQueue(
+export async function runTaskQueue(
   taskQueue: Array<ITask>,
-  hook: {
+  hook?: {
     onAllSuccess: () => void
   },
   maxRetry = 5) {
@@ -64,11 +64,10 @@ export function runTaskQueue(
       await processTask(task)
     }
   }
+  // TODO 收集失败
+  await processTaskQueue()
+}
 
-  processTaskQueue().then(() => {
-    console.log('All tasks have been processed')
-    hook.onAllSuccess()
-  }).catch((error) => {
-    console.error('Error processing tasks:', error.message)
-  })
+export function jsonClone(val: any) {
+  return JSON.parse(JSON.stringify(val))
 }

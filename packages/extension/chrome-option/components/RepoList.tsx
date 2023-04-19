@@ -1,7 +1,7 @@
 import { Input, Spin, Tooltip } from 'antd'
 import { getAllOrgsRepo, getAllRepo, getIssuesPR, getOrgsInfo } from '@pr-checker/fetchGit'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useThrottleFn } from 'ahooks'
+import { useGetState, useThrottleFn } from 'ahooks'
 import { createRunList } from '@pr-checker/utils'
 // TODO all select handle
 interface IRepoListProps {
@@ -22,7 +22,7 @@ export interface IRepoWithPRs extends IRepo {
 }
 
 export const RepoList = (props: IRepoListProps) => {
-  const [repoList, setRepoList] = useState<IRepoWithPRs[]>([])
+  const [repoList, setRepoList, getRepoList] = useGetState<IRepoWithPRs[]>([])
   const repoListCache = useRef<IRepoWithPRs[]>([])
   const [loading, setLoading] = useState(false)
   const { token, userName, opType, onSelect } = props
@@ -87,8 +87,8 @@ export const RepoList = (props: IRepoListProps) => {
     })
     // 将 map 转成数组，并设置到 state 里
     const resRepo = [...repos.values()]
-    repoListCache.current = resRepo.concat(repoList)
-    setRepoList([...resRepo.concat(repoList)])
+    repoListCache.current = resRepo.concat(getRepoList())
+    setRepoList([...repoListCache.current])
     resRepo.length > 0 && onSelect(resRepo[0])
   }
 

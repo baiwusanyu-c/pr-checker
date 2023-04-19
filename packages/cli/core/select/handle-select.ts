@@ -1,6 +1,6 @@
 
 import ora from 'ora'
-import { GitApi, createRunList, isEmptyObj, log, logType } from '@pr-checker/utils'
+import { GitApi, createRunList, isEmptyObj, log, logType, runTaskQueue } from '@pr-checker/utils'
 import { Table } from 'console-table-printer'
 import { createPrOption, createRepoOption, promptsRun, typeOption } from './select-configure'
 import type { IPRCheckRes, IPRListItem } from '@pr-checker/utils'
@@ -14,15 +14,18 @@ export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
   let updateRes = []
   const spinner = ora({ text: 'Loading Repo......', color: 'blue' }).start()
   const githubApi = new GitApi(store.token, store.username!)
-  const prList = mode === 'rebase' ? (await githubApi.getIssuesPRCLI()) : (await githubApi.getAllRepoPRList())
+  const prList = mode === 'rebase' ? (await githubApi.getIssuesPRCLI()) : (await githubApi.getAllRepoPRListCLI())
   spinner.stop()
   const repoList = Object.keys(prList)
-
   // select a repo to check
   if (isAllRepo.typeSelect === 'select') {
     // select repo
     const selectRepo = await promptsRun(createRepoOption(repoList))
-    const prl = prList[selectRepo.RepoSelect as keyof typeof prList] as IPRListItem[]
+    let prl = prList[selectRepo.RepoSelect as keyof typeof prList]
+    if (mode === 'merge') {
+      const res = await githubApi.getPRsCLI(prl[0].uname)
+      prl = res
+    }
     // check pr
     log('info', `Checking PR by ${selectRepo.RepoSelect}......`)
     const prListByRepo = await checkPR(prl, githubApi, mode)
@@ -32,6 +35,8 @@ export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
     log('info', `Update PR by ${selectRepo.RepoSelect}......`)
     updateRes = await updatePR(prl, prSelectRes as IPRSelect, githubApi, mode)
   } else {
+    // TODO types refactor
+    // TODO merge all
     const prl = [] as IPRListItem[]
     repoList.forEach((val: string) => {
       (prList[val as keyof typeof prList] as IPRListItem[]).forEach((item: IPRListItem) => {
@@ -50,6 +55,7 @@ export async function handleSelect(store: Storage, mode: 'merge' | 'rebase') {
 
   spinner.succeed()
   log('success', '✔ All PR updates completed')
+
   await printUpdateRes(updateRes as IPRCheckRes[])
 }
 
@@ -96,7 +102,7 @@ async function checkPR(
       let res = {
         number: prl[i].number,
         title: prl[i].title,
-        repoName: prl[i].repo,
+        repoName: prl[i].repo || prl[i].head.repo.full_name,
         state: 'no update',
         html_url: prl[i].html_url,
         opFlag: 0,
@@ -104,7 +110,7 @@ async function checkPR(
         base: prl[i].base ? prl[i].base.ref : '',
         head: prl[i].head ? prl[i].head.ref : '',
       }
-      res = await compareBranchToUpdate(prl[i].number, prl[i].repo, res, githubApi, mode)
+      res = await compareBranchToUpdate(prl[i].number, res.repoName, res, githubApi, mode)
       log('success', `✔ Check PR #${prl[i].number} completed`)
       return res
     } catch (error) {
@@ -119,22 +125,38 @@ async function updatePR(
   prSelectRes: IPRSelect,
   githubApi: GitApi,
   mode: 'merge' | 'rebase') {
-  const updateRes = await Promise.all(createRunList(prl.length, async(i: number) => {
-    if (prSelectRes.prSelect[i] && prSelectRes.prSelect[i].canOp) {
-      if (mode === 'rebase')
-        await githubApi.rebasePrCLI(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+  if (mode === 'rebase') {
+    const updateRes = await Promise.all(createRunList(prl.length, async(i: number) => {
+      if (prSelectRes.prSelect[i] && prSelectRes.prSelect[i].canOp) {
+        if (mode === 'rebase')
+          await githubApi.rebasePrCLI(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
 
-      // TODO 使用队列更新
-      if (mode === 'merge')
-        await githubApi.mergePR(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)
+        log('success', `✔ Update PR #${prl[i].number} completed`)
+      }
+      return {
+        ...prSelectRes.prSelect[i],
+      }
+    }))
 
-      log('success', `✔ Update PR #${prl[i].number} completed`)
+    return updateRes
+  }
+  if (mode === 'merge') {
+    try {
+      const taskList = []
+      for (let i = 0; i < prl.length; i++) {
+        taskList.push({
+          fn: githubApi.mergePrCLI.bind(githubApi),
+          params: [prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo],
+          retry: 0,
+          id: prSelectRes.prSelect[i].number,
+        })
+      }
+      await runTaskQueue(taskList)
+      return prSelectRes.prSelect
+    } catch (e) {
+      console.log(e)
     }
-    return {
-      ...prSelectRes.prSelect[i],
-    }
-  }))
-  return updateRes
+  }
 }
 
 async function printUpdateRes(res) {

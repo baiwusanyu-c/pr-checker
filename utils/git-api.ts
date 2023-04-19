@@ -1,6 +1,7 @@
 import { Octokit } from '@octokit/core'
 import { log } from './log'
-import { createRunList, isEmptyObj } from './common'
+import { createRunList } from './common'
+import type { IRepoWithPRs } from '@pr-checker/extension/chrome-option/components/RepoList'
 export declare interface IPRListItem {
   title: string
   number: number
@@ -49,7 +50,7 @@ export class GitApi {
       if (!data.items || (data.items && data.items.length === 0))
         log('error', 'You don\'t have any pull requests that are open')
 
-      const res = {} as Record<string, IPRListItem[]>
+      const res = {} as Record<string, any[]>
       data.items.forEach((val: any) => {
         const repo = val.repository_url.split('repos/')[1]
         if (!res[repo]) res[repo] = []
@@ -68,38 +69,49 @@ export class GitApi {
     }
   }
 
-  async getAllRepoPRList(username: string = this.owner) {
+  async getAllRepoPRListCLI() {
     try {
-      const { data } = await this.octokit.request('GET /user/repos', {
+      const { data: userReposData } = await this.octokit.request('GET /user/repos', {
         type: 'owner',
         per_page: 1000,
       })
-      const notForkRepoList = data.filter(v => !v.fork)
-      const res = {} as Record<string, IPRListItem[]>
-      await Promise.all(createRunList(notForkRepoList.length, async(i: number) => {
-        const { data: prData } = await this.octokit.request(
-          'GET /repos/{owner}/{repo}/pulls',
-          {
-            owner: username,
-            repo: notForkRepoList[i].name,
+
+      const { data: userOrgsData } = await this.octokit.request('GET /user/orgs', {
+        type: 'owner',
+        per_page: 1000,
+      })
+
+      let orgsReposData = []
+      await Promise.all(createRunList(userOrgsData.length, async(i: number) => {
+        const { data } = await this.octokit.request(
+          `GET /orgs/${userOrgsData[i].login}/repos`, {
+            type: 'owner',
             per_page: 1000,
           })
-
-        prData.forEach((val: any) => {
-          const repo = notForkRepoList[i].full_name
-          if (!res[repo]) res[repo] = []
-          res[repo].push({
-            title: val.title,
-            number: val.number,
-            repo,
-            id: val.id,
-          })
-        })
+        orgsReposData = data
       }))
 
-      if (isEmptyObj(res))
-        log('error', 'You don\'t have any pull requests')
-
+      function handleRepoInfoByMerge(res: Array<any>) {
+        const hasIssuesRepo = res.filter(val => !val.fork)
+        const repos = new Map<string, IRepoWithPRs>()
+        hasIssuesRepo.forEach((val) => {
+          const repoName = val.url.split('/').pop()!
+          const repoUName = val.url.split('repos/').pop()!
+          const repoURL = val.url
+          repos.set(repoURL, { name: repoName, url: repoURL, uname: repoUName, pullRequests: [val] })
+        })
+        // 将 map 转成数组，并设置到 state 里
+        return [...repos.values()]
+      }
+      const res = {} as Record<string, any[]>
+      handleRepoInfoByMerge(userReposData.concat(orgsReposData)).forEach((val: any) => {
+        const repo = val.url.split('repos/')[1]
+        if (!res[repo]) res[repo] = []
+        res[repo].push({
+          repo,
+          ...val,
+        })
+      })
       return res
     } catch (error: any) {
       if (error.status === 401)
@@ -124,6 +136,18 @@ export class GitApi {
         },
       )
 
+      return data
+    } catch (error: any) {
+      log('error', error)
+      return {}
+    }
+  }
+
+  async getPRsCLI(repo_name: string) {
+    try {
+      const { data } = await this.octokit.request(
+        `GET /repos/${repo_name}/pulls`,
+      )
       return data
     } catch (error: any) {
       log('error', error)
@@ -169,18 +193,18 @@ export class GitApi {
     }
   }
 
-  async mergePR(pull_number: number, repo_name: string) {
+  async mergePrCLI(pull_number: number, repo_name: string) {
     try {
       const res = await this.octokit.request(
-          `PUT /repos/${repo_name}/pulls/{pull_number}/merge`,
-          {
-            pull_number,
-          },
+        `PUT /repos/${repo_name}/pulls/{pull_number}/merge`,
+        {
+          pull_number,
+          merge_method: 'squash',
+        },
       )
       return res.data.message
     } catch (error: any) {
-      log('error', error)
-      return {}
+      throw error
     }
   }
 }
