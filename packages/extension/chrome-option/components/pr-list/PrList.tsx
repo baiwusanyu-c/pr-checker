@@ -58,7 +58,7 @@ export const PrList = (props: PrListProps) => {
       return res
     }, [props.token, props.opType])
 
-  const handleTableData = useCallback(async(prl: Record<any, any>[], uname) => {
+  const handleTableData = useCallback(async(prl: Record<any, any>[], uname: string) => {
     setTableData([])
     if (!prl || prl.length === 0) {
       setLoading(false)
@@ -108,7 +108,7 @@ export const PrList = (props: PrListProps) => {
 
   const { modal, message } = App.useApp()
   const { confirm } = modal
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const handleOp = async(item: DataType) => {
     confirm({
       title: 'Tips',
@@ -134,7 +134,7 @@ export const PrList = (props: PrListProps) => {
     })
   }
 
-  const [selectedItemData, setSelectedItemData] = useState([])
+  const [selectedItemData, setSelectedItemData] = useState<DataType[]>([])
   const rowSelection = {
     selectedRowKeys,
     onChange: (keys: React.Key[], selectedRows: DataType[]) => {
@@ -288,7 +288,7 @@ export const PrList = (props: PrListProps) => {
              loading={loading}
              size="middle"
              rowKey="id"
-             dataSource={tableData as RcTableProps<RecordType>['data']}
+             dataSource={tableData}
              scroll={{ y: 'calc(100vh - 200px)' }}
              pagination={false}
       />

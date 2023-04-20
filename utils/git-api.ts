@@ -1,32 +1,34 @@
 import { Octokit } from '@octokit/core'
 import { log } from './log'
 import { createRunList } from './common'
-import type { IRepoWithPRs } from '@pr-checker/extension/chrome-option/components/RepoList'
-export declare interface IPRListItem {
-  title: string
-  number: number
-  repo: string
-  id: number
-}
-export declare interface IPRInfo {
-  sha: string
-  org_repo: string
-  org_repo_default_branch: string
-  pr_sha: string
-  pr_repo: string
-  pr_repo_default_branch: string
-  mergeable: boolean
-  mergeable_state: string
-  merged: boolean
-  title: string
-  number: number
-  repo: string
-}
+import type { IRepoWithPRs } from '../packages/extension/chrome-option/components/RepoList'
 
-export declare interface IPRCheckRes extends IPRInfo{
-  isNeedUpdate: boolean
-  reason: string
+export declare type PRStateText = 'code conflict' | 'unstable' | 'can merge' | 'can rebase' | 'no update' | 'unknown error'
+export interface IPR extends IRepoWithPRs {
+  repo: string
+  repository_url: string
+  fork: boolean
+  number: number
+  title: string
+  html_url: string
+  id: number
+  head: {
+    repo: {
+      full_name: string
+    }
+    ref: string
+  }
+  base: {
+    ref: string
+  }
+  author: string
+  opFlag: 0 | 1 | 2 | 3
+  state: PRStateText
+  repoName: string
 }
+export declare type IPRList = Array<IPR>
+export declare type IPRListMap = Record<string, IPRList>
+
 export class GitApi {
   octokit: Octokit
   owner: string
@@ -50,12 +52,12 @@ export class GitApi {
       if (!data.items || (data.items && data.items.length === 0))
         log('error', 'You don\'t have any pull requests that are open')
 
-      const res = {} as Record<string, any[]>
-      data.items.forEach((val: any) => {
+      const res = {} as IPRListMap
+      (data.items as unknown as IPRList).forEach((val: IPR) => {
         const repo = val.repository_url.split('repos/')[1]
-        if (!res[repo]) res[repo] = []
+        if (!res[repo]) res[repo] = [] as IPRList
+        val.repo = repo
         res[repo].push({
-          repo,
           ...val,
         })
       })
@@ -81,7 +83,7 @@ export class GitApi {
         per_page: 1000,
       })
 
-      let orgsReposData = []
+      let orgsReposData = [] as IPRList
       await Promise.all(createRunList(userOrgsData.length, async(i: number) => {
         const { data } = await this.octokit.request(
           `GET /orgs/${userOrgsData[i].login}/repos`, {
@@ -91,7 +93,7 @@ export class GitApi {
         orgsReposData = data
       }))
 
-      function handleRepoInfoByMerge(res: Array<any>) {
+      function handleRepoInfoByMerge(res: IPRList) {
         const hasIssuesRepo = res.filter(val => !val.fork)
         const repos = new Map<string, IRepoWithPRs>()
         hasIssuesRepo.forEach((val) => {
@@ -101,17 +103,18 @@ export class GitApi {
           repos.set(repoURL, { name: repoName, url: repoURL, uname: repoUName, pullRequests: [val] })
         })
         // 将 map 转成数组，并设置到 state 里
-        return [...repos.values()]
+        return [...repos.values()] as IPRList
       }
-      const res = {} as Record<string, any[]>
-      handleRepoInfoByMerge(userReposData.concat(orgsReposData)).forEach((val: any) => {
-        const repo = val.url.split('repos/')[1]
-        if (!res[repo]) res[repo] = []
-        res[repo].push({
-          repo,
-          ...val,
+      const res = {} as IPRListMap
+      handleRepoInfoByMerge((userReposData as unknown as IPRList).concat(orgsReposData))
+        .forEach((val: IPR) => {
+          const repo = val.url.split('repos/')[1]
+          if (!res[repo]) res[repo] = []
+          val.repo = repo
+          res[repo].push({
+            ...val,
+          })
         })
-      })
       return res
     } catch (error: any) {
       if (error.status === 401)
@@ -169,7 +172,7 @@ export class GitApi {
       return data
     } catch (error: any) {
       log('error', error)
-      return {}
+      return {} as any
     }
   }
 
@@ -194,6 +197,7 @@ export class GitApi {
   }
 
   async mergePrCLI(pull_number: number, repo_name: string) {
+    // eslint-disable-next-line no-useless-catch
     try {
       const res = await this.octokit.request(
         `PUT /repos/${repo_name}/pulls/{pull_number}/merge`,

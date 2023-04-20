@@ -4,9 +4,11 @@ export enum CACHE_KEYS {
   OP_TYPE = 'OP_TYPE',
   USER_INFO = 'USER_INFO',
 }
-
+declare const chrome: any
 const cache = {} as Record<string, unknown>
-
+export type Cache = {
+  [key in CACHE_KEYS]: any;
+}
 export function useStorage() {
   syncCache()
   async function syncCache() {
@@ -57,9 +59,11 @@ export function useStorage() {
 
 export async function getAllStorageSyncData() {
   // Immediately return a promise and start asynchronous work
-  return new Promise((resolve, reject) => {
+  return new Promise<Cache>((resolve, reject) => {
     // Asynchronously fetch all data from storage.sync.
-    chrome.storage.sync.get(null, (items: any) => {
+    chrome.storage.sync.get(null, (items: {
+      [key in CACHE_KEYS]: any;
+    }) => {
       // Pass any observed errors down the promise chain.
       if (chrome.runtime.lastError)
         return reject(chrome.runtime.lastError)

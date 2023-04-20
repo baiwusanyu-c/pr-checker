@@ -6,11 +6,18 @@ import { UserOutlined } from '@ant-design/icons'
 import { useStorage } from '../../hooks/use-storage'
 import { LoginContent } from '../../components/LoginContent'
 import { LoginForm } from '../../components/LoginForm'
+declare const chrome: any
+interface IUserInfo {
+  html_url: string
+  avatar_url: string
+  login: string
+  name: string
+}
 export const PopupPage = () => {
   const { setItem, CACHE_KEYS, getItem } = useStorage()
   const [loading, setLoading] = useState(false)
   const [showInput, setShowInput] = useState(true)
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<IUserInfo>({
     html_url: '',
     avatar_url: '',
     login: '',
@@ -28,7 +35,7 @@ export const PopupPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const setUserData = async(res) => {
+  const setUserData = async(res: IUserInfo) => {
     setUserInfo({
       html_url: res.html_url,
       avatar_url: res.avatar_url,
@@ -62,7 +69,7 @@ export const PopupPage = () => {
     chrome.runtime.openOptionsPage()
   }, [CACHE_KEYS.OP_TYPE, setItem])
 
-  const onLogin = async(data) => {
+  const onLogin = async(data: IUserInfo) => {
     await setUserData(data)
     setShowInput(false)
   }

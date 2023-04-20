@@ -3,6 +3,7 @@ import { runTaskQueue } from '@pr-checker/utils/common'
 import { batchesMergePr, getPRs } from '@pr-checker/fetchGit'
 import { App } from 'antd'
 import { PrList } from './PrList'
+import type { ITask } from '@pr-checker/utils/common'
 import type { DataType, opFlag } from './PrList'
 import type { IRepoWithPRs } from '../RepoList'
 interface PrListProps {
@@ -27,7 +28,7 @@ export const PrMergeList = (props: PrListProps) => {
   const { message } = App.useApp()
   async function mergePrList(token: string, repoName: string, itemArr: DataType[]) {
     try {
-      const taskList = []
+      const taskList: Array<ITask> = []
       for (let i = 0; i < itemArr.length; i++) {
         const params = {
           commit_message: `【pr-checker】Merging pull requests: #${itemArr[i].number}`,
@@ -37,12 +38,12 @@ export const PrMergeList = (props: PrListProps) => {
           fn: batchesMergePr,
           params: [token, repoName, itemArr[i].number, params],
           retry: 0,
-          id: itemArr[i].number,
+          id: Number(itemArr[i].number),
         })
       }
       // TODO 收集失败和成功信息
       await runTaskQueue(taskList, {
-        onAllSuccess: () => {
+        onFinished: () => {
           message.open({
             type: 'success',
             content: `${props.opType} success`,

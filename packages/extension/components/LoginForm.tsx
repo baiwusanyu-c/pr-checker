@@ -2,6 +2,7 @@ import { Button, Form, Input, Spin } from 'antd'
 import { useCallback, useState } from 'react'
 import { getUserInfo } from '@pr-checker/fetchGit'
 import { useStorage } from '../hooks/use-storage'
+declare const chrome: any
 interface LoginFormProps {
   onLogin?: (userInfo: any) => void
   onFinished?: () => void
@@ -22,7 +23,7 @@ export const LoginForm = (props: LoginFormProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onFinish = useCallback(async(values) => {
+  const onFinish = useCallback(async(values: any) => {
     const userInfo = await getItem(CACHE_KEYS.USER_INFO)
     if (!userInfo)
       await getUserData(values.token)
@@ -47,7 +48,7 @@ export const LoginForm = (props: LoginFormProps) => {
   return (
     <Spin spinning={loading} tip="Loading...">
     <Form
-      layout="vertical "
+      layout="vertical"
       onFinish={onFinish}
     >
       <Form.Item label={<span className="dark:text-white">Github Token</span>}

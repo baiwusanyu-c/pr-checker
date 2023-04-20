@@ -3,6 +3,8 @@ import { getAllOrgsRepo, getAllRepo, getIssuesPR, getOrgsInfo } from '@pr-checke
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useGetState, useThrottleFn } from 'ahooks'
 import { createRunList } from '@pr-checker/utils'
+import type { IPR } from '@pr-checker/utils'
+import type { ChangeEvent } from 'react'
 // TODO all select handle
 interface IRepoListProps {
   opType: string
@@ -33,7 +35,7 @@ export const RepoList = (props: IRepoListProps) => {
         .then((res) => {
           // 使用 map 避免重复遍历
           const repos = new Map<string, IRepoWithPRs>()
-          res.items.forEach((val) => {
+          res.items.forEach((val: IPR) => {
             const repoName = val.repository_url.split('/').pop()!
             const repoUName = val.repository_url.split('repos/').pop()!
             const repoURL = val.repository_url
@@ -123,7 +125,7 @@ export const RepoList = (props: IRepoListProps) => {
     ))
   }, [repoList, handleClick, activeIndex])
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const searchParams = e.target.value
     const filterRes = repoListCache.current.filter((item) => {
       return item.name.toLowerCase().includes(searchParams.toLowerCase())

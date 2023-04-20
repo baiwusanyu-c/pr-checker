@@ -1,8 +1,22 @@
 
 import { formatEllipsis, log, logType } from '@pr-checker/utils'
 import prompts from 'prompts'
+import type { IPR, IPRList } from '@pr-checker/utils'
+import type { modeType } from './handle-select'
 import type { opFlag } from '@pr-checker/extension/chrome-option/components/pr-list/PrList'
 import type * as promptsType from 'prompts'
+export interface IPRSelect {
+  title: string
+  number: number
+  repo: string
+  canOp: boolean
+  reason: string
+  infoTitle: string
+}
+export declare type IPRSelectList = Array<IPRSelect>
+export interface IPRSelectRes {
+  prSelect: IPRSelectList
+}
 export const typeOption = [{
   type: 'select',
   name: 'typeSelect',
@@ -27,21 +41,21 @@ export const createRepoOption = (list: string[]) => {
   }] as promptsType.PromptObject[]
 }
 
-export const createPrOption = (list, mode) => {
-  const handler = (item) => {
-    const repo = logType.info('', `[${formatEllipsis(item.repoName)}]`)
-    const number = logType.warning('', `[#${item.number}]`)
+export const createPrOption = (list: IPRList, mode: modeType) => {
+  const handler = (item: IPR) => {
+    const repo = logType.info(`[${formatEllipsis(item.repoName)}]`)
+    const number = logType.warning(`[#${item.number}]`)
     const title = formatEllipsis(`${item.title}`, 36)
 
-    const disablePolicy = (flag: opFlag, mode) => {
+    const disablePolicy = (flag: opFlag, mode: modeType) => {
       if (mode === 'merge')
         return !(flag === 2 || flag === 0)
       else
         return flag !== 2
     }
     const op = !disablePolicy(item.opFlag, mode)
-      ? logType.warning('', '\'<can merge>\'')
-      : logType.error('', `<can\`t merge:${item.state}>`)
+      ? logType.warning('\'<can merge>\'')
+      : logType.error(`<can\`t merge:${item.state}>`)
 
     const infoTitle = `${op}: ${repo}-${number} -> ${title}`
     return {

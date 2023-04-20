@@ -3,6 +3,7 @@ const logoImg = new URL('../assets/img/logo.png', import.meta.url).href
 interface LoginContentProps {
   cls: string
   showGH: boolean
+  children?: React.ReactNode
 }
 export const LoginContent = (props: LoginContentProps) => {
   return (

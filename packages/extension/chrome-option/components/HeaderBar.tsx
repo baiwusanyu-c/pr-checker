@@ -16,7 +16,7 @@ interface HeaderBarProps {
   }
   repoInfo: IRepoWithPRs
   isLogin?: boolean
-  toggleTheme?: (boolean) => void
+  toggleTheme?: (toggle: boolean) => void
 }
 export const HeaderBar = (props: HeaderBarProps = {
   userInfo: {
