@@ -3,7 +3,7 @@
   "description": "🌷 Detect and update your Pull Requests in batches",
   "private": false,
   "type": "module",
-  "version": "1.3.2",
+  "version": "1.5.0",
   "packageManager": "pnpm@7.0.0",
   "keywords": [
     "github",
