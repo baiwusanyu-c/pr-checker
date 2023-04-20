@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { runTaskQueue } from '@pr-checker/utils/common'
 import { batchesMergePr, getPRs } from '@pr-checker/fetchGit'
 import { App } from 'antd'
+import { ExclamationCircleFilled } from '@ant-design/icons'
 import { PrList } from './PrList'
 import type { ITask } from '@pr-checker/utils/common'
 import type { DataType, opFlag } from './PrList'
@@ -25,7 +26,8 @@ export const PrMergeList = (props: PrListProps) => {
       getPRsByRepo(props.repoInfo)
   }, [props.repoInfo, getPRsByRepo])
 
-  const { message } = App.useApp()
+  const { modal, message } = App.useApp()
+  const { error } = modal
   async function mergePrList(token: string, repoName: string, itemArr: DataType[]) {
     try {
       const taskList: Array<ITask> = []
@@ -41,13 +43,38 @@ export const PrMergeList = (props: PrListProps) => {
           id: Number(itemArr[i].number),
         })
       }
-      // TODO 收集失败和成功信息
+
+      const failTaskList = []
       await runTaskQueue(taskList, {
         onFinished: () => {
-          message.open({
-            type: 'success',
-            content: `${props.opType} success`,
-          })
+          if (failTaskList.length > 0) {
+            error({
+              title: 'Tips',
+              icon: <ExclamationCircleFilled />,
+              content: (
+                <div className="text-lg">
+                  <p className="m-0">For some unknown reason your operation failed for the following pr</p>
+                  {
+                    failTaskList.map((value) => {
+                      return (
+                        <p className="m-0 text-main" key={value.number + value.repoName}>
+                          # {value.number}
+                        </p>
+                      )
+                    })
+                  }
+                </div>
+              ),
+            })
+          } else {
+            message.open({
+              type: 'success',
+              content: `${props.opType} success`,
+            })
+          }
+        },
+        onTaskFailed(index) {
+          failTaskList.push(itemArr[index])
         },
       })
     } catch (e) {
