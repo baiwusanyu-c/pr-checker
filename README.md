@@ -1,7 +1,7 @@
 
 # 🚀 PR-Checker
 
-Detect and update your Pull Requests in batches
+Detect and update your Pull Requests in batches, it contains a browser extension with `cli`
 
 English | [中文](https://github.com/baiwusanyu-c/pr-checker/blob/master/README.ZH-CN.md)
 ## Features
@@ -11,7 +11,16 @@ English | [中文](https://github.com/baiwusanyu-c/pr-checker/blob/master/README
 - 🔥️ Check whether all `PR` under your account need to be updated with one click of the command
 - 🌷 Choose to update all `PR` under your account by command
 
-## How to ues ?
+## How to use BROWSER EXTENSIONS
+
+It's very easy to use, you just need to install
+
+## BROWSER EXTENSIONS Screenshot
+
+<img src="./public/popup.png" alt="Detect and update your Pull Requests in batches"/>
+<img src="./public/option.png" alt="Detect and update your Pull Requests in batches"/>
+
+## How to ues CLI?
 
 #### 1.Install
 
@@ -67,34 +76,33 @@ pr-checker run
 ````
 After that, the `PR` will be checked to see if it can be updated
 ```shell
-√ Please select a Repo » vuejs/core
-| Checking PR by vuejs/core......✔ NO.1:Check PR #7662 completed
-- Checking PR by vuejs/core......✔ NO.2:Check PR #7557 completed
-/ Checking PR by vuejs/core......✔ NO.3:Check PR #7541 completed
-\ Checking PR by vuejs/core......✔ NO.4:Check PR #7525 completed
-/ Checking PR by vuejs/core......
+✔ Please select a Repo › vuejs/core
+[pr-checker]:Checking PR by vuejs/core......
+[pr-checker]:✔ Check PR #7525 completed
+[pr-checker]:✔ Check PR #7502 completed
+[pr-checker]:✔ Check PR #7557 completed
+[pr-checker]:✔ Check PR #7004 completed
+[pr-checker]:✔ Check PR #7457 completed
 
 ```
 
 #### 5. Select `PR` to update
 
 ```` shell
-? Please select the PR that needs to be updated »
-Instructions:
-    ↑/↓: Highlight option
-    ←/→/[space]: Toggle selection
-    a: Toggle all
-    enter/return: Complete answer
-(*)   <CanMerge:false>: [vuejs/core]-[#7662] -> feat(customElement): Additional event arguments of CustomEvent
-(*)   <CanMerge:false>: [vuejs/core]-[#7557] -> fix(compiler-ssr): TransitionGroup owns style-scoped properties on SSR
-(*)   <CanMerge:true>: [vuejs/core]-[#7541] -> fix(runtime-dom): `transitionGroup` can render `:slotted` styles
-( )   <CanMerge:true>: [vuejs/core]-[#7525] -> feat(runtime-dom): custom element support v-model
-( )   <CanMerge:true>: [vuejs/core]-[#7502] -> fix(server-renderer): getSSRProps can get exposed property
-( )   <CanMerge:true>: [vuejs/core]-[#7475] -> fix(runtime-dom): undefined cssvars should not be bound to the element
-( )   <CanMerge:true>: [vuejs/core]-[#7457] -> fix(runtime-core): boolean type and string type problem during props normalization process
-( )   <CanMerge:true>: [vuejs/core]-[#7434] -> fix(runtime-core): Select elements can preserve data types when stringified
-( )   <CanMerge:true>: [vuejs/core]-[#7344] -> fix(runtime): CSSVars can work with Teleport
-( ) ↓ <CanMerge:true>: [vuejs/core]-[#7341] -> fix(runtime-core): Fix cssvars reporting error when teleport is disabled
+? Please select the PR that needs to be updated › 
+◯   <can`t merge:no update>: [vuejs/core]-[#7942] -> feat(custom-element): Custom element...
+◯   <can`t merge:no update>: [vuejs/core]-[#7901] -> fix(runtime-dom): TransitionGroup do...
+◯   <can`t merge:no update>: [vuejs/core]-[#7891] -> refactor(server-renderer): slotScope...
+◯   <can`t merge:no update>: [vuejs/core]-[#7837] -> fix(runtime-core): `to` changes duri...
+◯   <can`t merge:no update>: [vuejs/core]-[#7803] -> feat(compiler-sfc): support props na...
+◯   <can`t merge:no update>: [vuejs/core]-[#7776] -> fix(hydration): Use decodeHtml when ...
+◯   <can`t merge:no update>: [vuejs/core]-[#7730] -> fix(compiler-core): using v-once ins...
+◯   <can`t merge:no update>: [vuejs/core]-[#7716] -> fix(runtime-core): fix error when v-...
+◯   <can`t merge:no update>: [vuejs/core]-[#7557] -> fix(compiler-ssr): TransitionGroup o...
+◯   <can`t merge:no update>: [vuejs/core]-[#7541] -> fix(runtime-dom): `transitionGroup` ...
+◯   <can`t merge:no update>: [vuejs/core]-[#7525] -> feat(runtime-dom): custom element su...
+◯   <can`t merge:no update>: [vuejs/core]-[#7502] -> fix(server-renderer): getSSRProps ca...
+◯   <can`t merge:no update>: [vuejs/core]-[#7475] -> fix(runtime-dom): undefined cssvars ...
 
 ````
 After the last update is completed, those that do not meet the update conditions (such as code conflicts) will be deemed unable to be automatically updated.
@@ -140,21 +148,21 @@ Use `rebase` mode or `merge` mode, the default value is `rebase` mode
 > In `rebase` mode, you can choose a repository or directly `rebase` all your submitted `pr`
 It will call `/repos/${repoName}/pulls/${prNumber}/update-branch`.
 
->In `merge` mode, you can `merge` on repositories you own (except `fork` repositories)
+>In `merge` mode, it's an experimental feature . You can `merge` on repositories you own (except `fork` repositories)
 It will call `/repos/${repoName}/pulls/${prNumber}/merge`.
-A typical usage scenario is batch processing `pr` of `dependabot` (the function of adding to `merge queue` has not yet been completed)
+A typical usage scenario is batch processing `pr` of `dependabot` (the function of adding to `merge queue` has not yet been completed).
+In addition, since the github api does not support importing pr to the merge queue, I used the queue for round-robin requests, so it is not guaranteed that all pr
+can be successfully merged
+
 
 ```` shell
 pr-checker run -m merge ｜ rebase
 ````
 
-```` shell
-pr-checker -h
-````
-
-## Screenshot
-<img src="./public/img1.png" alt="Detect and update your Pull Requests in batches"/>
-<img src="./public/img2.png" alt="Detect and update your Pull Requests in batches"/>
+## CLI Screenshot
+<img src="./public/cli1.png" alt="Detect and update your Pull Requests in batches"/>
+<img src="./public/cli2.png" alt="Detect and update your Pull Requests in batches"/>
+<img src="public/cli3.png" alt="Detect and update your Pull Requests in batches"/>
 
 ## Thanks
 * [cpr](https://github.com/edison1105/cpr)

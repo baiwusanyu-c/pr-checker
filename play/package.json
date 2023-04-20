@@ -15,7 +15,7 @@
     "test:get": "pr-checker -g",
     "test:username": "pr-checker -u baiwusanyu-c",
     "test:token": "pr-checker -t baiwusanyu-c",
-    "play": "esno index.ts run -m merge"
+    "play": "esno index.ts run"
   },
 
   "devDependencies": {
