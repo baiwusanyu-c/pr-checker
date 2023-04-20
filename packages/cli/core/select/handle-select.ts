@@ -19,6 +19,7 @@ import type {
   IPRListMap,
   IPRSelectList,
   IPRSelectRes,
+  PRStateText,
   Storage,
   modeType,
 } from '@pr-checker/utils/types'
@@ -52,13 +53,18 @@ export async function handleSelect(store: Storage, mode: modeType) {
     log('info', `Update PR by ${selectRepo.RepoSelect}......`)
     updateRes = (await updatePR(prl, prSelectRes as IPRSelectRes, githubApi, mode))!
   } else {
-    // TODO merge all
-    const prl = [] as IPRList
-    repoList.forEach((val: string) => {
-      (prList[val as keyof typeof prList]).forEach((item: IPR) => {
-        prl.push(item)
-      })
-    })
+    let prl = [] as IPRList
+    for (const val of repoList) {
+      if (mode === 'merge') {
+        log('info', val)
+        const res = await githubApi.getPRsCLI(val)
+        prl = prl.concat(res)
+      } else {
+        (prList[val as keyof typeof prList]).forEach((item: IPR) => {
+          prl.push(item)
+        })
+      }
+    }
     // check pr
     log('info', 'Checking PR......')
     const prListByRepo = await checkPR(prl, githubApi, mode)
@@ -97,7 +103,7 @@ const compareBranchToUpdate = async(
     // need update pr ?
     const compareRes = await githubApi.compareBranchCLI(basehead, repoName, onwer)
     if (prInfo.mergeable_state === 'clean' && (compareRes.behind_by > 0)) {
-      res.state = `can ${mode}`
+      res.state = `can ${mode}` as PRStateText
       res.opFlag = 2
     }
   }

@@ -8,5 +8,5 @@ export const logType = {
   success: (msg: string, prefix = '') => chalk.greenBright.bold(`${prefix}${msg}`),
 }
 export const log = (type: TLog, msg: string, prefix = '[pr-checker]:') => {
-  console.log(logType[type](prefix, msg))
+  console.log(logType[type](msg, prefix))
 }
