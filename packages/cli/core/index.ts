@@ -6,7 +6,7 @@ import { version } from '../../../package.json'
 import { loadStorage, saveStorage } from './store/storage'
 import { handleSelect } from './select/handle-select'
 import { handleOption } from './option/handle-option'
-import type { Storage } from './store/storage'
+import type { Storage } from '@pr-checker/utils/types'
 
 export const run = async() => {
   const cliInst = await initCli()

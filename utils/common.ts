@@ -1,3 +1,5 @@
+import type { ITask, ITaskQueueHooks } from './types'
+
 export function createRunList(
   taskNum: number,
   taskFunc: (index: number) => Promise<Record<any, any> | void>) {
@@ -30,17 +32,6 @@ export function formatEllipsis(str = '', limitLen = 24) {
   return inx === -1 ? str : `${str.substr(0, inx)}...`
 }
 
-export interface ITask {
-  fn: (...args: any[]) => any
-  params: Array<any>
-  retry: number
-  id: number
-}
-export interface ITaskQueueHooks {
-  onFinished?: () => void
-  onTaskSucceeded?: (index: number, task: ITask) => void
-  onTaskFailed?: (index: number, task: ITask) => void
-}
 export async function runTaskQueue(
   taskQueue: Array<ITask>,
   hook?: ITaskQueueHooks,

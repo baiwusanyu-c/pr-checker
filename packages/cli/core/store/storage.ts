@@ -1,13 +1,7 @@
 import { existsSync, promises as fs, mkdirSync } from 'fs'
 import { resolve } from 'path'
 import { homedir } from 'os'
-
-export interface Storage {
-  lastRunCommand?: string
-  token: string
-  username?: string
-}
-
+import type { Storage } from '@pr-checker/utils/types'
 let storage: Storage | undefined
 
 const storageDir = (() => {

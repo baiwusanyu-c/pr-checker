@@ -2,7 +2,7 @@ import { Button, Form, Input, Spin } from 'antd'
 import { useCallback, useState } from 'react'
 import { getUserInfo } from '@pr-checker/fetchGit'
 import { useStorage } from '../hooks/use-storage'
-declare const chrome: any
+
 interface LoginFormProps {
   onLogin?: (userInfo: any) => void
   onFinished?: () => void

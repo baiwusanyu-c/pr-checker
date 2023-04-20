@@ -7,7 +7,7 @@ import { CarbonSun } from '../../components/IconSun'
 import { CarbonMoon } from '../../components/IconMoon'
 import { LoginContent } from '../../components/LoginContent'
 import { LoginForm } from '../../components/LoginForm'
-import type { IRepoWithPRs } from './RepoList'
+import type { IRepoWithPRs } from '@pr-checker/utils/types'
 import '../../assets/styles/login.css'
 interface HeaderBarProps {
   userInfo: {

@@ -1,11 +1,6 @@
 import { log } from '@pr-checker/utils'
 import { clearStorage, loadStorage, saveStorage } from '../store/storage'
-
-interface ParsedArgv {
-  args: ReadonlyArray<string>
-  options: Record<string, any>
-}
-
+import type { ParsedArgv } from '@pr-checker/utils/types'
 export async function handleOption(parseRes: ParsedArgv) {
   // load storage
   const storage = await loadStorage()

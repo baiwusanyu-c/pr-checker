@@ -1,9 +1,6 @@
 import { useThrottleFn } from 'ahooks'
+import type { ISearchL } from '@pr-checker/utils/types'
 import type { ChangeEvent, MutableRefObject } from 'react'
-export interface ISearchL {
-  title: string
-  author: string
-}
 export function useSearch<T extends ISearchL >(
   tableDataCache: MutableRefObject<T[]>,
   update: (p: T[]) => void) {

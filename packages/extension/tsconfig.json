@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "react-jsx"
   },
   "include": [
     "chrome-background/**/*.tsx",
@@ -23,7 +23,8 @@
     "chrome-option/**/*.tsx",
     "chrome-popup/**/*.ts",
     "chrome-popup/**/*.tsx",
-    "store/**/*.ts"
+    "store/**/*.ts",
+    "global.d.ts"
   ],
   "references": [{ "path": "../../tsconfig.node.json"}]
 }

@@ -4,9 +4,8 @@ import { batchesMergePr, getPRs } from '@pr-checker/fetchGit'
 import { App } from 'antd'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import { PrList } from './PrList'
-import type { ITask } from '@pr-checker/utils/common'
-import type { DataType, opFlag } from './PrList'
-import type { IRepoWithPRs } from '../RepoList'
+import type { DataType } from './PrList'
+import type { IRepoWithPRs, ITask, opFlag } from '@pr-checker/utils/types'
 interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs
@@ -44,7 +43,7 @@ export const PrMergeList = (props: PrListProps) => {
         })
       }
 
-      const failTaskList = []
+      const failTaskList: DataType[] = []
       await runTaskQueue(taskList, {
         onFinished: () => {
           if (failTaskList.length > 0) {

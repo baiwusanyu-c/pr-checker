@@ -1,22 +1,9 @@
 
 import { formatEllipsis, log, logType } from '@pr-checker/utils'
 import prompts from 'prompts'
-import type { IPR, IPRList } from '@pr-checker/utils'
-import type { modeType } from './handle-select'
-import type { opFlag } from '@pr-checker/extension/chrome-option/components/pr-list/PrList'
+import type { IPR, IPRList, modeType, opFlag } from '@pr-checker/utils/types'
 import type * as promptsType from 'prompts'
-export interface IPRSelect {
-  title: string
-  number: number
-  repo: string
-  canOp: boolean
-  reason: string
-  infoTitle: string
-}
-export declare type IPRSelectList = Array<IPRSelect>
-export interface IPRSelectRes {
-  prSelect: IPRSelectList
-}
+
 export const typeOption = [{
   type: 'select',
   name: 'typeSelect',

@@ -1,34 +1,12 @@
 import { Octokit } from '@octokit/core'
 import { log } from './log'
 import { createRunList } from './common'
-import type { IRepoWithPRs } from '../packages/extension/chrome-option/components/RepoList'
-
-export declare type PRStateText = 'code conflict' | 'unstable' | 'can merge' | 'can rebase' | 'no update' | 'unknown error'
-export interface IPR extends IRepoWithPRs {
-  repo: string
-  repository_url: string
-  fork: boolean
-  number: number
-  title: string
-  html_url: string
-  id: number
-  head: {
-    repo: {
-      full_name: string
-    }
-    ref: string
-  }
-  base: {
-    ref: string
-  }
-  author: string
-  opFlag: 0 | 1 | 2 | 3
-  state: PRStateText
-  repoName: string
-}
-export declare type IPRList = Array<IPR>
-export declare type IPRListMap = Record<string, IPRList>
-
+import type {
+  IPR,
+  IPRList,
+  IPRListMap,
+  IRepoWithPRs,
+} from './types'
 export class GitApi {
   octokit: Octokit
   owner: string

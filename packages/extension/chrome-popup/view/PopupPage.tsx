@@ -6,13 +6,7 @@ import { UserOutlined } from '@ant-design/icons'
 import { useStorage } from '../../hooks/use-storage'
 import { LoginContent } from '../../components/LoginContent'
 import { LoginForm } from '../../components/LoginForm'
-declare const chrome: any
-interface IUserInfo {
-  html_url: string
-  avatar_url: string
-  login: string
-  name: string
-}
+import type { IUserInfo } from '@pr-checker/utils/types'
 export const PopupPage = () => {
   const { setItem, CACHE_KEYS, getItem } = useStorage()
   const [loading, setLoading] = useState(false)

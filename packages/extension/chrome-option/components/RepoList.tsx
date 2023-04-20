@@ -3,25 +3,9 @@ import { getAllOrgsRepo, getAllRepo, getIssuesPR, getOrgsInfo } from '@pr-checke
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useGetState, useThrottleFn } from 'ahooks'
 import { createRunList } from '@pr-checker/utils'
-import type { IPR } from '@pr-checker/utils'
+import type { IPR, IRepoListProps, IRepoWithPRs } from '@pr-checker/utils/types'
 import type { ChangeEvent } from 'react'
 // TODO all select handle
-interface IRepoListProps {
-  opType: string
-  token: string
-  userName: string
-  onSelect: (data: IRepoWithPRs) => void
-}
-
-interface IRepo {
-  name: string
-  uname: string
-  url: string
-}
-
-export interface IRepoWithPRs extends IRepo {
-  pullRequests: Record<any, any>[]
-}
 
 export const RepoList = (props: IRepoListProps) => {
   const [repoList, setRepoList, getRepoList] = useGetState<IRepoWithPRs[]>([])

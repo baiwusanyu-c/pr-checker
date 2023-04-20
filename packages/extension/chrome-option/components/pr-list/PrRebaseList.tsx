@@ -2,8 +2,8 @@ import { createRunList } from '@pr-checker/utils/common'
 import { rebasePr } from '@pr-checker/fetchGit'
 import { App } from 'antd'
 import { PrList } from './PrList'
-import type { IRepoWithPRs } from '../RepoList'
-import type { DataType, opFlag } from './PrList'
+import type { IRepoWithPRs, opFlag } from '@pr-checker/utils/types'
+import type { DataType } from './PrList'
 interface PrListProps {
   opType: string
   repoInfo: IRepoWithPRs

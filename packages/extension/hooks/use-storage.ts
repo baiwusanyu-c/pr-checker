@@ -4,7 +4,6 @@ export enum CACHE_KEYS {
   OP_TYPE = 'OP_TYPE',
   USER_INFO = 'USER_INFO',
 }
-declare const chrome: any
 const cache = {} as Record<string, unknown>
 export type Cache = {
   [key in CACHE_KEYS]: any;

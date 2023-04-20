@@ -14,16 +14,15 @@ import {
   typeOption,
 } from './select-configure'
 import type {
-  IPRSelectList,
-  IPRSelectRes,
-} from './select-configure'
-import type {
   IPR,
   IPRList,
   IPRListMap,
-} from '@pr-checker/utils'
-import type { Storage } from '../store/storage'
-export declare type modeType = 'merge' | 'rebase'
+  IPRSelectList,
+  IPRSelectRes,
+  Storage,
+  modeType,
+} from '@pr-checker/utils/types'
+
 export async function handleSelect(store: Storage, mode: modeType) {
   // select type ( all Repo ?)
   const isAllRepo = await promptsRun(typeOption)
