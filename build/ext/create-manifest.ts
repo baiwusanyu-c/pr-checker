@@ -32,12 +32,8 @@ function getManifest() {
         description: 'Opens hello.html',
       },
     },
-    host_permissions: [
-      '*://*/*',
-    ],
     permissions: [
       'storage',
-      'activeTab',
     ],
     homepage_url: pkg.homepage,
     icons: {
