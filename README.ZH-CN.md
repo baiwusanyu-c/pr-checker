@@ -14,8 +14,8 @@
 
 ## 浏览器扩展使用
 
-它的使用非常简单，你只需要安装即可
-
+它的使用非常简单，你只需要安装即可  
+https://chrome.google.com/webstore/detail/pr-checker/gjalikalkhmfboaleppagmeflcfbjiej
 ## 浏览器扩展快照
 
 <img src="./public/popup.png" alt="Detect and update your Pull Requests in batches"/>
