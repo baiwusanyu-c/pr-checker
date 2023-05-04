@@ -13,7 +13,8 @@ English | [中文](https://github.com/baiwusanyu-c/pr-checker/blob/master/README
 
 ## How to use BROWSER EXTENSIONS
 
-It's very easy to use, you just need to install
+It's very easy to use, you just need to install  
+https://chrome.google.com/webstore/detail/pr-checker/gjalikalkhmfboaleppagmeflcfbjiej
 
 ## BROWSER EXTENSIONS Screenshot
 
