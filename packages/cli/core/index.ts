@@ -1,7 +1,7 @@
 import * as process from 'process'
-import { getUserName, log } from '@pr-checker/utils'
+import { getUserName } from '@pr-checker/utils'
 import { cac } from 'cac'
-
+import { log, setGlobalPrefix } from 'baiwusanyu-utils'
 import { version } from '../../../package.json'
 import { loadStorage, saveStorage } from './store/storage'
 import { handleSelect } from './select/handle-select'
@@ -9,6 +9,7 @@ import { handleOption } from './option/handle-option'
 import type { Storage } from '@pr-checker/utils/types'
 
 export const run = async() => {
+  setGlobalPrefix('[pr-checker]: ')
   const cliInst = await initCli()
   await handleOption(cliInst.parse())
 }

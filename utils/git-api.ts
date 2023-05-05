@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/core'
-import { log } from './log'
+import { log } from 'baiwusanyu-utils'
 import { createRunList } from './common'
 import type {
   IPR,

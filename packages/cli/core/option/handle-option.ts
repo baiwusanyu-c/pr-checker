@@ -1,4 +1,4 @@
-import { log } from '@pr-checker/utils'
+import { log } from 'baiwusanyu-utils'
 import { clearStorage, loadStorage, saveStorage } from '../store/storage'
 import type { ParsedArgv } from '@pr-checker/utils/types'
 export async function handleOption(parseRes: ParsedArgv) {

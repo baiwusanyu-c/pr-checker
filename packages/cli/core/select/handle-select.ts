@@ -3,10 +3,9 @@ import {
   GitApi,
   createRunList,
   isEmptyObj,
-  log,
-  logType,
   runTaskQueue,
 } from '@pr-checker/utils'
+import { log, logType } from 'baiwusanyu-utils'
 import { Table } from 'console-table-printer'
 import {
   createPrOption, createRepoOption,

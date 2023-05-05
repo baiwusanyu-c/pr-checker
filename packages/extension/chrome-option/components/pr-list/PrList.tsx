@@ -137,7 +137,6 @@ export const PrList = (props: PrListProps) => {
   const rowSelection = {
     selectedRowKeys,
     onChange: (keys: React.Key[], selectedRows: DataType[]) => {
-      console.log(selectedRows)
       setSelectedItemData(selectedRows)
       setSelectedRowKeys(keys)
     },

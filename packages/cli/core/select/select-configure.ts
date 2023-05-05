@@ -1,5 +1,5 @@
-
-import { formatEllipsis, log, logType } from '@pr-checker/utils'
+import { log, logType } from 'baiwusanyu-utils'
+import { formatEllipsis } from '@pr-checker/utils'
 import prompts from 'prompts'
 import type { IPR, IPRList, modeType, opFlag } from '@pr-checker/utils/types'
 import type * as promptsType from 'prompts'
