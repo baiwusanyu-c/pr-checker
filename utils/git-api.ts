@@ -1,6 +1,5 @@
 import { Octokit } from '@octokit/core'
-import { log } from 'baiwusanyu-utils'
-import { createRunList } from './common'
+import { log, setAsyncTaskList } from 'baiwusanyu-utils'
 import type {
   IPR,
   IPRList,
@@ -62,7 +61,7 @@ export class GitApi {
       })
 
       let orgsReposData = [] as IPRList
-      await Promise.all(createRunList(userOrgsData.length, async(i: number) => {
+      await Promise.all(setAsyncTaskList(userOrgsData.length, async(i: number) => {
         const { data } = await this.octokit.request(
           `GET /orgs/${userOrgsData[i].login}/repos`, {
             type: 'owner',

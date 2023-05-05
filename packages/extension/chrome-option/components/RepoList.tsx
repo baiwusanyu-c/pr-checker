@@ -2,7 +2,7 @@ import { Input, Spin, Tooltip } from 'antd'
 import { getAllOrgsRepo, getAllRepo, getIssuesPR, getOrgsInfo } from '@pr-checker/fetchGit'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useGetState, useThrottleFn } from 'ahooks'
-import { createRunList } from '@pr-checker/utils'
+import { setAsyncTaskList } from 'baiwusanyu-utils'
 import type { IPR, IRepoListProps, IRepoWithPRs } from '@pr-checker/utils/types'
 import type { ChangeEvent } from 'react'
 // TODO all select handle
@@ -50,7 +50,7 @@ export const RepoList = (props: IRepoListProps) => {
         setLoading(false)
       })
       getOrgsInfo(token).then(async(res) => {
-        await Promise.all(createRunList(res.length, async(i: number) => {
+        await Promise.all(setAsyncTaskList(res.length, async(i: number) => {
           setLoading(true)
           const repo = await getAllOrgsRepo(token, res[i].login)
           handleRepoInfoByMerge(repo)

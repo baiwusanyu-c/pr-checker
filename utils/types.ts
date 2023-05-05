@@ -15,8 +15,6 @@ export interface IRepoWithPRs extends IRepo {
   pullRequests: Record<any, any>[]
 }
 
-export declare type TLog = 'error' | 'warning' | 'info' | 'success'
-
 export declare type opFlag = 0 | 1 | 2 | 3
 
 export declare type PRStateText = 'code conflict' | 'unstable' | 'can merge' | 'can rebase' | 'no update' | 'unknown error'
@@ -45,18 +43,6 @@ export interface IPR extends IRepoWithPRs {
 }
 export declare type IPRList = Array<IPR>
 export declare type IPRListMap = Record<string, IPRList>
-
-export interface ITask {
-  fn: (...args: any[]) => any
-  params: Array<any>
-  retry: number
-  id: number
-}
-export interface ITaskQueueHooks {
-  onFinished?: () => void
-  onTaskSucceeded?: (index: number, task: ITask) => void
-  onTaskFailed?: (index: number, task: ITask) => void
-}
 
 export interface ParsedArgv {
   args: ReadonlyArray<string>

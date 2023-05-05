@@ -1,12 +1,12 @@
 import { App, ConfigProvider, Layout, theme } from 'antd'
 import { useEffect, useState } from 'react'
-import { isEmptyObj } from '@pr-checker/utils/common'
+import { isEmptyObj } from 'baiwusanyu-utils'
 import { getAllStorageSyncData } from '../../hooks/use-storage'
 import { RepoList } from '../components/RepoList'
 import { HeaderBar } from '../components/HeaderBar'
 import { PrRebaseList } from '../components/pr-list/PrRebaseList'
 import { PrMergeList } from '../components/pr-list/PrMergeList'
-import type { IRepoWithPRs } from '../components/RepoList'
+import type { IRepoWithPRs } from '@pr-checker/utils/types'
 const logoImg = new URL('../../assets/img/logo.png', import.meta.url).href
 const { Header, Sider, Content } = Layout
 

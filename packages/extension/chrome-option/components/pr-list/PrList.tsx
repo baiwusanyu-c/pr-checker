@@ -1,7 +1,7 @@
 import { App, Button, Input, Space, Table, Tag, Tooltip } from 'antd'
 import { ExclamationCircleFilled, ReloadOutlined } from '@ant-design/icons'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createRunList } from '@pr-checker/utils/common'
+import { setAsyncTaskList } from 'baiwusanyu-utils'
 import { compareBranch, getPRDetail } from '@pr-checker/fetchGit'
 import { useSearch } from '../../../hooks/use-search'
 import type React from 'react'
@@ -65,7 +65,7 @@ export const PrList = (props: PrListProps) => {
     }
 
     try {
-      const res = await Promise.all(createRunList(prl.length, async(i: number) => {
+      const res = await Promise.all(setAsyncTaskList(prl.length, async(i: number) => {
         let res = {
           number: prl[i].number,
           title: prl[i].title,

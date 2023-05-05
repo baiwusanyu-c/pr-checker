@@ -1,11 +1,9 @@
 import ora from 'ora'
 import {
   GitApi,
-  createRunList,
-  isEmptyObj,
   runTaskQueue,
 } from '@pr-checker/utils'
-import { log, logType } from 'baiwusanyu-utils'
+import { log, logType, setAsyncTaskList } from 'baiwusanyu-utils'
 import { Table } from 'console-table-printer'
 import {
   createPrOption, createRepoOption,
@@ -118,7 +116,7 @@ async function checkPR(
     process.exit()
   }
 
-  const prListByRepo = await Promise.all(createRunList(prl.length, async(i: number) => {
+  const prListByRepo = await Promise.all(setAsyncTaskList(prl.length, async(i: number) => {
     try {
       let res = {
         number: prl[i].number,
@@ -147,7 +145,7 @@ async function updatePR(
   githubApi: GitApi,
   mode: modeType) {
   if (mode === 'rebase') {
-    const updateRes = await Promise.all(createRunList(prl.length, async(i: number) => {
+    const updateRes = await Promise.all(setAsyncTaskList(prl.length, async(i: number) => {
       if (prSelectRes.prSelect[i] && prSelectRes.prSelect[i].canOp) {
         if (mode === 'rebase')
           await githubApi.rebasePrCLI(prSelectRes.prSelect[i].number, prSelectRes.prSelect[i].repo)

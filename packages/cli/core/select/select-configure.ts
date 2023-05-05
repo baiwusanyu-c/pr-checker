@@ -1,5 +1,4 @@
-import { log, logType } from 'baiwusanyu-utils'
-import { formatEllipsis } from '@pr-checker/utils'
+import { log, logType, normalizeEllipsis } from 'baiwusanyu-utils'
 import prompts from 'prompts'
 import type { IPR, IPRList, modeType, opFlag } from '@pr-checker/utils/types'
 import type * as promptsType from 'prompts'
@@ -30,9 +29,9 @@ export const createRepoOption = (list: string[]) => {
 
 export const createPrOption = (list: IPRList, mode: modeType) => {
   const handler = (item: IPR) => {
-    const repo = logType.info(`[${formatEllipsis(item.repoName)}]`)
+    const repo = logType.info(`[${normalizeEllipsis(item.repoName)}]`)
     const number = logType.warning(`[#${item.number}]`)
-    const title = formatEllipsis(`${item.title}`, 36)
+    const title = normalizeEllipsis(`${item.title}`, 36)
 
     const disablePolicy = (flag: opFlag, mode: modeType) => {
       if (mode === 'merge')

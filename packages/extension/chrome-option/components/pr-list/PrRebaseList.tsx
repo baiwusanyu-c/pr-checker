@@ -1,4 +1,4 @@
-import { createRunList } from '@pr-checker/utils/common'
+import { setAsyncTaskList } from 'baiwusanyu-utils'
 import { rebasePr } from '@pr-checker/fetchGit'
 import { App } from 'antd'
 import { PrList } from './PrList'
@@ -21,7 +21,7 @@ export const PrRebaseList = (props: PrListProps) => {
     repoName: string,
     itemArr: DataType[]) {
     try {
-      await Promise.all(createRunList(itemArr.length, async(i: number) => {
+      await Promise.all(setAsyncTaskList(itemArr.length, async(i: number) => {
         await rebasePr(token, repoName, itemArr[i].number)
       }))
       message.open({
