@@ -21,7 +21,7 @@ https://chrome.google.com/webstore/detail/pr-checker/gjalikalkhmfboaleppagmeflcf
 <img src="./public/popup.png" alt="Detect and update your Pull Requests in batches"/>
 <img src="./public/option.png" alt="Detect and update your Pull Requests in batches"/>
 
-## How to ues CLI?
+## How to use CLI?
 
 #### 1.Install
 
